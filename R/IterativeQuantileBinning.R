@@ -27,7 +27,7 @@
 #'                     nbins=c(3,5,2), output="both",jit=rep(0.001,3))
 #' iqbin(data=iris, bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
 #'                     nbins=c(3,5,2), output="data")
-iqbin <- function(data, bin_cols, nbins,jit = rep(0,length(bin_cols)), output="data"){
+iqbin <- function(data, bin_cols, nbins, jit = rep(0,length(bin_cols)), output="data"){
   data <- as.data.frame(data)
   # row.names(data) <- 1:nrow(data)
   bin_dim <- length(bin_cols)

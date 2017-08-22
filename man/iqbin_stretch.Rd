@@ -17,10 +17,3 @@ updated binning definition with bins extended by tolerance values
 \description{
 New observations selected from the same population as the data used to build bin definitions may fall just outside the bins. If we wish to include nearby values we can either allow outer bins to be extended (this function) or to leave the outer bins unbounded.
 }
-\examples{
-iq_def <- iqbin(data=iris, bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
-                              nbins=c(3,2,2), output="both")
-stretch_iq_def <- iqbin_stretch(iq_def, tol = c(1,1,1))
-iq_def$bin_def$bin_bounds
-stretch_iq_def$bin_def$bin_bounds
-}

@@ -30,8 +30,3 @@ list containing binned training data, binning definition, and bin statistics
 \description{
 Function for creating iterative quantile nearest neighbors model. Bin the training data, then store the binning definitions and bin statistics to be used to estimate for future testing data.
 }
-\examples{
-iqnn_mod <- iqnn(data=iris, y="Species", mod_type="class", bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
-                 nbins=c(3,5,2), jit=rep(0.001,3), tol = rep(0.001,3))
-str(iqnn_mod)                
-}
