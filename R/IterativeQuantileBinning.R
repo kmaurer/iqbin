@@ -80,11 +80,11 @@ iqbin <- function(data, bin_cols, nbins,jit = rep(0,length(bin_cols)), output="d
 #' @examples
 #' iq_def <- iqbin(data=iris, bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
 #'                               nbins=c(3,2,2), output="both")
-#' stretch_iq_def <- stretch_iqbin(iq_def, tol = c(1,1,1))
+#' stretch_iq_def <- iqbin_stretch(iq_def, tol = c(1,1,1))
 #' iq_def$bin_def$bin_bounds
 #' stretch_iq_def$bin_def$bin_bounds
 
-stretch_iqbin <- function(iq_def, tol){
+iqbin_stretch <- function(iq_def, tol){
   b = nrow(iq_def$bin_def$bin_bounds)
   p = length(iq_def$bin_def$nbins)
   for (d in 1:p){
@@ -119,9 +119,9 @@ stretch_iqbin <- function(iq_def, tol){
 #' withhold_index <- c(1,2,51,52,101,102)
 #' iq_def <- iqbin(data=iris[-withhold_index,], bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
 #'                               nbins=c(3,2,2), output="definition")
-#' assign_iqbin(bin_def=iq_def, new_data=iris[withhold_index,], output="data")
+#' iqbin_assign(bin_def=iq_def, new_data=iris[withhold_index,], output="data")
 
-assign_iqbin <- function(bin_def, new_data, output="data", strict=FALSE){
+iqbin_assign <- function(bin_def, new_data, output="data", strict=FALSE){
   new_data <- as.data.frame(new_data)
   #!# need to introduce similar jitter to new data as in definition so "boundary" points allocated randomly
   #

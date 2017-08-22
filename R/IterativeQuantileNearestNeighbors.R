@@ -22,7 +22,7 @@
 iqnn <- function(data, y, mod_type="reg", bin_cols, nbins, jit = rep(0,length(bin_cols)), stretch=FALSE, tol = rep(0,length(bin_cols)) ){
   data <- as.data.frame(data)
   iq_bin <- iqbin(data, bin_cols, nbins, output="both",jit)
-  if(stretch) iq_bin <- stretch_iqbin(iq_bin, tol=tol)
+  if(stretch) iq_bin <- iqbin_stretch(iq_bin, tol=tol)
   iq_bin$bin_def$y <- y
   total_bins = nrow(iq_bin$bin_def$bin_centers)
   if(mod_type=="reg"){
@@ -52,21 +52,21 @@ iqnn <- function(data, y, mod_type="reg", bin_cols, nbins, jit = rep(0,length(bi
 #' iqnn_mod <- iqnn(iris[-test_index,], y="Petal.Length", bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
 #'                  nbins=c(3,5,2), jit=rep(0.001,3), stretch=TRUE, tol=rep(.2,3))
 #' test_data <- iris[test_index,]
-#' predict_iqnn(iqnn_mod, test_data,strict=FALSE)
-#' predict_iqnn(iqnn_mod, test_data,strict=TRUE)
-#' predict_iqnn(iqnn_mod, test_data,type="both")
+#' iqnn_predict(iqnn_mod, test_data,strict=FALSE)
+#' iqnn_predict(iqnn_mod, test_data,strict=TRUE)
+#' iqnn_predict(iqnn_mod, test_data,type="both")
 #' 
 #' # Test Classifier
 #' iqnn_mod <- iqnn(data=iris[-test_index,], y="Species", mod_type="class", bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
 #'                  nbins=c(3,5,2), jit=rep(0.001,3), tol = rep(0.001,3))
 #' test_data <- iris[test_index,]
-#' predict_iqnn(iqnn_mod, test_data,strict=FALSE)
-#' predict_iqnn(iqnn_mod, test_data,type="both",strict=FALSE)
+#' iqnn_predict(iqnn_mod, test_data,strict=FALSE)
+#' iqnn_predict(iqnn_mod, test_data,type="both",strict=FALSE)
 
-predict_iqnn <- function(iqnn_mod,test_data, type="estimate",strict=FALSE){
+iqnn_predict <- function(iqnn_mod,test_data, type="estimate",strict=FALSE){
   test_data <- as.data.frame(test_data)
   #!# has bugs when strict=TRUE
-  test_bin <- assign_iqbin(iqnn_mod, test_data, output="data",strict=strict)
+  test_bin <- iqbin_assign(iqnn_mod, test_data, output="data",strict=strict)
   if(type=="estimate") return(iqnn_mod$bin_stats$pred[test_bin$bin_indeces])
   if(type=="binsize") return(iqnn_mod$bin_stats$obs[test_bin$bin_indeces])
   if(type=="both") return(iqnn_mod$bin_stats[test_bin$bin_indeces,])
@@ -90,11 +90,11 @@ predict_iqnn <- function(iqnn_mod,test_data, type="estimate",strict=FALSE){
 #' 
 #' @return cross validated predicted responses for all observations in data
 #' @examples 
-# cv_preds <- cv_pred_iqnn(data=iris, y="Species",mod_type="class", bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
+# cv_preds <- iqnn_cv_predict(data=iris, y="Species",mod_type="class", bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
 #              nbins=c(3,5,2), jit=rep(0.001,3), strict=FALSE, cv_k=10)
 # table(cv_preds, iris$Species)
 
-cv_pred_iqnn <- function(data, y, mod_type="reg", bin_cols, nbins, jit=rep(0,length(bin_cols)), stretch=FALSE, tol=rep(0,length(bin_cols)), strict=FALSE, cv_k=10){
+iqnn_cv_predict <- function(data, y, mod_type="reg", bin_cols, nbins, jit=rep(0,length(bin_cols)), stretch=FALSE, tol=rep(0,length(bin_cols)), strict=FALSE, cv_k=10){
   data <- as.data.frame(data)
   cv_cohorts <- make_cv_cohorts(data, cv_k)
   cv_preds <- rep(NA,nrow(data))
@@ -104,7 +104,7 @@ cv_pred_iqnn <- function(data, y, mod_type="reg", bin_cols, nbins, jit=rep(0,len
     row.names(train_data_temp) <- 1:nrow(train_data_temp)
     iqnn_mod <- iqnn(train_data_temp, y=y, mod_type=mod_type, bin_cols=bin_cols, 
                      nbins=nbins, jit=jit,stretch=stretch, tol=tol)
-    cv_preds[test_index] <- predict_iqnn(iqnn_mod, data[test_index,],strict=strict, type="estimate")
+    cv_preds[test_index] <- iqnn_predict(iqnn_mod, data[test_index,],strict=strict, type="estimate")
   }
   if(mod_type=="class") cv_preds <- factor(cv_preds, labels=levels(data[,y]))
   cv_preds
@@ -129,19 +129,19 @@ cv_pred_iqnn <- function(data, y, mod_type="reg", bin_cols, nbins, jit=rep(0,len
 #' @return data frame with one row per binning specification with desriptive and performance statistics: bin dimensitions, number of bins, equivalent k-nearest neightbor size, performance (mean squared error or class error rate)
 #' @examples 
 #' # 10-fold CV
-#' cv_tune1 <- tune_iqnn(data=iris, y="Petal.Length", bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
+#' cv_tune1 <- iqnn_tune(data=iris, y="Petal.Length", bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
 #'                       nbins_range=c(2,5), jit=rep(0.001,3), strict=FALSE, cv_k=10)
 #' cv_tune1
 #' # LOO CV
-#' cv_tune2 <- tune_iqnn(data=iris, y="Petal.Length", bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
+#' cv_tune2 <- iqnn_tune(data=iris, y="Petal.Length", bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
 #'                       nbins_range=c(2,5), jit=rep(0.001,3), strict=FALSE, cv_k=nrow(iris))
 #' cv_tune2
 
-tune_iqnn <- function(data, y, mod_type="reg", bin_cols, nbins_range, jit=rep(0,length(bin_cols)), stretch=FALSE, tol=rep(0,length(bin_cols)), strict=FALSE, cv_k=10){
+iqnn_tune <- function(data, y, mod_type="reg", bin_cols, nbins_range, jit=rep(0,length(bin_cols)), stretch=FALSE, tol=rep(0,length(bin_cols)), strict=FALSE, cv_k=10){
   nbins_list <- make_nbins_list(nbins_range,length(bin_cols))
   cv_results <- data.frame(bin_dims = sapply(nbins_list, function(x) paste(x,collapse="X")))
   for(t in 1:length(nbins_list)){
-    cv_preds <- cv_pred_iqnn(data, y, mod_type=mod_type, bin_cols, nbins_list[[t]], jit, stretch, tol, strict, cv_k)
+    cv_preds <- iqnn_cv_predict(data, y, mod_type=mod_type, bin_cols, nbins_list[[t]], jit, stretch, tol, strict, cv_k)
     if(mod_type=="reg") cv_results$MSE[t] <- mean((data[,y]-cv_preds)^2)
     if(mod_type=="class") cv_results$error[t] <- sum(cv_preds!=dat[,y_name]) / nrow(dat)
     cv_results$nbins_total[t] <- prod(nbins_list[[t]])
