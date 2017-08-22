@@ -35,3 +35,8 @@ cross validated predicted responses for all observations in data
 \description{
 Cross-validate an iqnn specification using k-fold scheme on given data
 }
+\examples{
+cv_preds <- iqnn_cv_predict(data=iris, y="Species",mod_type="class", bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
+             nbins=c(3,5,2), jit=rep(0.001,3), strict=FALSE, cv_k=10)
+table(cv_preds, iris$Species)
+}

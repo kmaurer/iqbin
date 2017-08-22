@@ -91,11 +91,11 @@ iqbin <- function(data, bin_cols, nbins, jit = rep(0,length(bin_cols)), output="
 #'
 #' @return updated binning definition with bins extended by tolerance values
 #' @examples
-# iq_def <- iqbin(data=iris, bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
-#                               nbins=c(3,2,2), output="both")
-# stretch_iq_def <- iqbin_stretch(iq_def, tol = c(1,1,1))
-# iq_def$bin_def$bin_bounds
-# stretch_iq_def$bin_def$bin_bounds
+#' iq_def <- iqbin(data=iris, bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
+#'                              nbins=c(3,2,2), output="both")
+#' stretch_iq_def <- iqbin_stretch(iq_def, tol = c(1,1,1))
+#' iq_def$bin_def$bin_bounds
+#' stretch_iq_def$bin_def$bin_bounds
 
 iqbin_stretch <- function(iq_def, tol){
   b = nrow(iq_def$bin_def$bin_bounds)
