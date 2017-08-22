@@ -1,6 +1,43 @@
 ### Helper functions for Iterative Quantile Binning Functions
 
 #--------------------------------------
+#' One-Dimensional Empirical Quantile Binning
+#'
+#' @description used for binning the numeric values by empirical quantile
+#'
+#' @param xs Numeric vector of values to be binned
+#' @param nbin An integer defining the number of bins to partion the xs into
+#' @param output Output Structure: "data" for just the binned data,"definition" for a list of bin centers and boundaries, or "both" for list containing both data and definition
+#' @param jit non-negative value to specify a random uniform jitter to the observed values prior to partitioning by quantiles.
+#'
+#' @return output as specified
+#' @examples
+#' quant_bin_1d(ggplot2::diamonds$price,4,output="data")
+#' quant_bin_1d(ggplot2::diamonds$price,4,output="definition")
+#' quant_bin_1d(runif(1000,0,10),nbin=4,output="both")
+
+quant_bin_1d <- function(xs, nbin, output="data",jit=0){
+  if(jit > 0)  xs <- xs + runif(length(xs),-jit,jit)
+  quants <- quantile(xs, seq(0, 1, by=1/(2*nbin)))
+  bin_centers <- quants[seq(2,length(quants)-1, by=2)]
+  bin_bounds <- quants[seq(1,length(quants)+1, by=2)]
+  if(jit > 0) bin_bounds[c(1,length(bin_bounds))] <- bin_bounds[c(1,length(bin_bounds))]+c(-jit,jit)
+  if(output=="definition") {
+    return(list(bin_centers=bin_centers,bin_bounds=bin_bounds))
+  } else{
+    bin_data <- bin_centers[.bincode(xs,bin_bounds,T,T)]
+    if(output=="data") return(bin_data)
+    if(output=="both") return(list(bin_data=bin_data,bin_centers=bin_centers,bin_bounds=bin_bounds))
+  }
+}
+# Speed test
+# load("~/onePercentSample.Rdata")
+# timer <- Sys.time()
+# quant_bin_1d(onePercentSample$total_amount,100,output="data", jit=.00001)
+# Sys.time()-timer
+# Note: using .bincode() this take ~2 seconds instead of ~10 seconds with for loop overwrite from original
+
+#--------------------------------------
 #' Convert bin bounds data frame into R-tree structure using nested lists
 #'
 #' @description Convert bin bounds data frame into R-tree structure using nested lists
@@ -10,7 +47,7 @@
 #' 
 #' @return R-tree nested list of bin boundaries
 #' @examples 
-#' iq_def <- iterative_quant_bin(data=iris, bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
+#' iq_def <- iqbin(data=iris, bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
 #'                     nbins=c(3,2,2), output="definition",jit=rep(0.001,3))
 #' iq_def$bin_bounds
 #' make_bin_list(bin_bounds=iq_def$bin_bounds,nbins=c(3,2,2))
@@ -55,7 +92,7 @@ make_bin_list <- function(bin_bounds,nbins){
 #' 
 #' @return bin index for new observation
 #' @examples 
-#' iq_def <- iterative_quant_bin(data=iris[-test_index,], bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
+#' iq_def <- iqbin(data=iris[-test_index,], bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
 #'                               nbins=c(3,2,2), output="both")
 #' bin_index_finder_nest(x=c(6,3,1.5),bin_def=iq_def$bin_def, strict=TRUE)
 
@@ -79,7 +116,7 @@ bin_index_finder_nest <- function(x, bin_def, strict=TRUE){
 #--------------------------------------
 #' Stack Matrix builder
 #'
-#' @description function to make a J matrix for duplicating the N rows of a matrix M times each. (support funciton for iterative_quant_bin function)
+#' @description function to make a J matrix for duplicating the N rows of a matrix M times each. (support funciton for iqbin function)
 #' @param N number of rows
 #' @param M number of duplicates
 #' 

@@ -21,8 +21,8 @@
 
 iqnn <- function(data, y, mod_type="reg", bin_cols, nbins, jit = rep(0,length(bin_cols)), stretch=FALSE, tol = rep(0,length(bin_cols)) ){
   data <- as.data.frame(data)
-  iq_bin <- iterative_quant_bin(data, bin_cols, nbins, output="both",jit)
-  if(stretch) iq_bin <- stretch_iq_bins(iq_bin, tol=tol)
+  iq_bin <- iqbin(data, bin_cols, nbins, output="both",jit)
+  if(stretch) iq_bin <- stretch_iqbin(iq_bin, tol=tol)
   iq_bin$bin_def$y <- y
   total_bins = nrow(iq_bin$bin_def$bin_centers)
   if(mod_type=="reg"){
@@ -66,7 +66,7 @@ iqnn <- function(data, y, mod_type="reg", bin_cols, nbins, jit = rep(0,length(bi
 predict_iqnn <- function(iqnn_mod,test_data, type="estimate",strict=FALSE){
   test_data <- as.data.frame(test_data)
   #!# has bugs when strict=TRUE
-  test_bin <- bin_by_iq_def(iqnn_mod, test_data, output="data",strict=strict)
+  test_bin <- assign_iqbin(iqnn_mod, test_data, output="data",strict=strict)
   if(type=="estimate") return(iqnn_mod$bin_stats$pred[test_bin$bin_indeces])
   if(type=="binsize") return(iqnn_mod$bin_stats$obs[test_bin$bin_indeces])
   if(type=="both") return(iqnn_mod$bin_stats[test_bin$bin_indeces,])
