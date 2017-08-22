@@ -15,9 +15,9 @@
 #' 
 #' @return list containing binned training data, binning definition, and bin statistics
 #' @examples 
-#' iqnn_mod <- iqnn(data=iris, y="Species", mod_type="class", bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
-#'                  nbins=c(3,5,2), jit=rep(0.001,3), tol = rep(0.001,3))
-#' str(iqnn_mod)                
+# iqnn_mod <- iqnn(data=iris, y="Species", mod_type="class", bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
+#                  nbins=c(3,5,2), jit=rep(0.001,3), tol = rep(0.001,3))
+# str(iqnn_mod)
 
 iqnn <- function(data, y, mod_type="reg", bin_cols, nbins, jit = rep(0,length(bin_cols)), stretch=FALSE, tol = rep(0,length(bin_cols)) ){
   data <- as.data.frame(data)
@@ -32,6 +32,7 @@ iqnn <- function(data, y, mod_type="reg", bin_cols, nbins, jit = rep(0,length(bi
     iq_bin$bin_def$bin_stats <- data.frame(pred = sapply(1:total_bins, function(b) majority_vote(data[iq_bin$bin_data$bin_data$bin_index==b,y])),
                                            obs = sapply(1:total_bins, function(b) sum(iq_bin$bin_data$bin_data$bin_index==b)) )
   }else{return(print("mod_type must be either 'reg' or 'class'"))}
+  class(iq_bin$bin_def) <- "iqnn"
   return(iq_bin$bin_def)
 }
 

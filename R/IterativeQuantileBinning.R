@@ -68,12 +68,14 @@ iqbin <- function(data, bin_cols, nbins,jit = rep(0,length(bin_cols)), output="d
   row.names(bin_data) <- 1:nrow(bin_data)
   #
   bin_list <- make_bin_list(bin_bounds,nbins)
-  if(output=="data") return(list(data=data,bin_data=bin_data))
-  if(output=="definition") return(list(bin_centers=bin_centers, bin_bounds=bin_bounds, bin_cols=bin_cols, nbins=nbins, jit=jit, bin_list=bin_list))
+  if(output=="data") iqbin_obj <- list(data=data,bin_data=bin_data)
+  if(output=="definition") iqbin_obj <- list(bin_centers=bin_centers, bin_bounds=bin_bounds, bin_cols=bin_cols, nbins=nbins, jit=jit, bin_list=bin_list)
   if(output=="both"){
-    return(list(bin_data=list(data=data,bin_data=bin_data),
-                bin_def=list(bin_centers=bin_centers, bin_bounds=bin_bounds, bin_cols=bin_cols, nbins=nbins, jit=jit, bin_list=bin_list)))
+    iqbin_obj <- list(bin_data=list(data=data,bin_data=bin_data),
+                bin_def=list(bin_centers=bin_centers, bin_bounds=bin_bounds, bin_cols=bin_cols, nbins=nbins, jit=jit, bin_list=bin_list))
   }
+  class(iqbin_obj) <- "iqbin"
+  return(iqbin_obj)
 }
 
 #--------------------------------------
@@ -86,11 +88,11 @@ iqbin <- function(data, bin_cols, nbins,jit = rep(0,length(bin_cols)), output="d
 #'
 #' @return updated binning definition with bins extended by tolerance values
 #' @examples
-#' iq_def <- iqbin(data=iris, bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
-#'                               nbins=c(3,2,2), output="both")
-#' stretch_iq_def <- iqbin_stretch(iq_def, tol = c(1,1,1))
-#' iq_def$bin_def$bin_bounds
-#' stretch_iq_def$bin_def$bin_bounds
+# iq_def <- iqbin(data=iris, bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
+#                               nbins=c(3,2,2), output="both")
+# stretch_iq_def <- iqbin_stretch(iq_def, tol = c(1,1,1))
+# iq_def$bin_def$bin_bounds
+# stretch_iq_def$bin_def$bin_bounds
 
 iqbin_stretch <- function(iq_def, tol){
   b = nrow(iq_def$bin_def$bin_bounds)
