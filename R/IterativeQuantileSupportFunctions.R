@@ -14,10 +14,15 @@
 #' @examples
 #' quant_bin_1d(ggplot2::diamonds$price,4,output="data")
 #' quant_bin_1d(ggplot2::diamonds$price,4,output="definition")
-#' quant_bin_1d(runif(1000,0,10),nbin=4,output="both")
+#' quant_bin_1d(runif(100,0,10),nbin=4,output="both")
+#' quant_bin_1d(runif(100,0,10),nbin=4,output="both", jit=.1)
 
 quant_bin_1d <- function(xs, nbin, output="data",jit=0){
-  if(jit > 0)  xs <- xs + runif(length(xs),-jit,jit)
+  jit_values <- NULL
+  if(jit > 0) {
+    jit_values <- runif(length(xs),-jit,jit)
+    xs <- xs + jit_values 
+  }
   quants <- quantile(xs, seq(0, 1, by=1/(2*nbin)))
   bin_centers <- quants[seq(2,length(quants)-1, by=2)]
   bin_bounds <- quants[seq(1,length(quants)+1, by=2)]
@@ -27,7 +32,7 @@ quant_bin_1d <- function(xs, nbin, output="data",jit=0){
   } else{
     bin_data <- bin_centers[.bincode(xs,bin_bounds,T,T)]
     if(output=="data") return(bin_data)
-    if(output=="both") return(list(bin_data=bin_data,bin_centers=bin_centers,bin_bounds=bin_bounds))
+    if(output=="both") return(list(bin_data=bin_data,bin_centers=bin_centers,bin_bounds=bin_bounds,jit_values=jit_values))
   }
 }
 # Speed test

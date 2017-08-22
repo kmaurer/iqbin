@@ -26,14 +26,16 @@
 #' iqbin(data=iris, bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
 #'                     nbins=c(3,5,2), output="both",jit=rep(0.001,3))
 #' iqbin(data=iris, bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
-#'                     nbins=c(3,5,2), output="both")
+#'                     nbins=c(3,5,2), output="data")
 iqbin <- function(data, bin_cols, nbins,jit = rep(0,length(bin_cols)), output="data"){
   data <- as.data.frame(data)
   # row.names(data) <- 1:nrow(data)
   bin_dim <- length(bin_cols)
   bin_data <- matrix(NA,nrow=nrow(data),ncol=bin_dim, dimnames=list(row.names(data),paste(bin_cols,"binned",sep="_")))
   # Initialize with first binning step
+  bin_jit <- NULL
   step_bin_info <- quant_bin_1d(data[,bin_cols[1]], nbins[1],output="both",jit[1])
+  if(sum(jit>0)>0) bin_jit <- data.frame("V1"=step_bin_info$jit_values)
   bin_bounds <- matrix(c(step_bin_info$bin_bounds[1:nbins[1]],
                          step_bin_info$bin_bounds[2:(nbins[1]+1)]),
                        nrow=nbins[1],byrow=FALSE )
@@ -55,6 +57,7 @@ iqbin <- function(data, bin_cols, nbins,jit = rep(0,length(bin_cols)), output="d
                                                           nrow=nbins[d],byrow=FALSE)
       bin_centers[b:(b+nbins[d]-1),d] <- matrix(step_bin_info$bin_centers, nrow=nbins[d])
       bin_data[in_bin_b,d] <- step_bin_info$bin_data
+      if(sum(jit>0)>0) bin_jit[,d] <- step_bin_info$jit_values
     }
   }
   # add bin index column to bin_data
@@ -68,10 +71,10 @@ iqbin <- function(data, bin_cols, nbins,jit = rep(0,length(bin_cols)), output="d
   row.names(bin_data) <- 1:nrow(bin_data)
   #
   bin_list <- make_bin_list(bin_bounds,nbins)
-  if(output=="data") iqbin_obj <- list(data=data,bin_data=bin_data)
+  if(output=="data") iqbin_obj <- list(data=data,bin_data=bin_data,bin_jit=bin_jit)
   if(output=="definition") iqbin_obj <- list(bin_centers=bin_centers, bin_bounds=bin_bounds, bin_cols=bin_cols, nbins=nbins, jit=jit, bin_list=bin_list)
   if(output=="both"){
-    iqbin_obj <- list(bin_data=list(data=data,bin_data=bin_data),
+    iqbin_obj <- list(bin_data=list(data=data,bin_data=bin_data,bin_jit=bin_jit),
                 bin_def=list(bin_centers=bin_centers, bin_bounds=bin_bounds, bin_cols=bin_cols, nbins=nbins, jit=jit, bin_list=bin_list))
   }
   class(iqbin_obj) <- "iqbin"

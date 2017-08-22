@@ -13,19 +13,25 @@
 iqbin_plot_2d <- function(iq_obj){
   if(class(iq_obj)=="iqbin"){
     bounds <- as.data.frame(iq_obj$bin_def$bin_bounds)
-    training <- iq_obj$bin_data$data
+    train <- iq_obj$bin_data$data[,iq_obj$bin_def$bin_cols]
+    bin_jit <- iq_obj$bin_data$bin_jit
+    train_jit <- train + bin_jit
   }
   if(class(iq_obj)=="iqnn") bounds <- as.data.frame(iq_obj$bin_bounds)
   
   p1 <- ggplot() +
     geom_rect(aes(xmin=V1, xmax=V2, ymin=V3, ymax=V4),color="black",fill=NA, data=bounds)+
     theme_bw()
-  if(class(iq_obj)=="iqbin") p1 <- p1 + geom_point(aes_string(x=iq_obj$bin_def$bin_cols[1],y=iq_obj$bin_def$bin_cols[2]), data=iq_obj$bin_data$data)
+  if(class(iq_obj)=="iqbin"){
+    p1 <- p1 + geom_point(aes_string(x=iq_obj$bin_def$bin_cols[1],
+                                     y=iq_obj$bin_def$bin_cols[2]), 
+                          data=train_jit)
+  } 
   p1
 }
 
 iq_obj <- iqbin(data=iris, bin_cols=c("Sepal.Length","Sepal.Width"),
-                    nbins=c(5,3), output="both",jit=rep(0.001,2))
+                    nbins=c(5,3), output="both",jit=rep(0.1,2))
 str(iq_obj)
 class(iq_obj)
 
