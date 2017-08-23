@@ -15,9 +15,9 @@
 #' 
 #' @return list containing binned training data, binning definition, and bin statistics
 #' @examples 
-# iqnn_mod <- iqnn(data=iris, y="Species", mod_type="class", bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
-#                  nbins=c(3,5,2), jit=rep(0.001,3), tol = rep(0.001,3))
-# str(iqnn_mod)
+#' iqnn_mod <- iqnn(data=iris, y="Species", mod_type="class", bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
+#'                  nbins=c(3,5,2), jit=rep(0.001,3), tol = rep(0.001,3))
+#' str(iqnn_mod)
 
 iqnn <- function(data, y, mod_type="reg", bin_cols, nbins, jit = rep(0,length(bin_cols)), stretch=FALSE, tol = rep(0,length(bin_cols)) ){
   data <- as.data.frame(data)
@@ -91,9 +91,9 @@ iqnn_predict <- function(iqnn_mod,test_data, type="estimate",strict=FALSE){
 #' 
 #' @return cross validated predicted responses for all observations in data
 #' @examples 
-# cv_preds <- iqnn_cv_predict(data=iris, y="Species",mod_type="class", bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
-#              nbins=c(3,5,2), jit=rep(0.001,3), strict=FALSE, cv_k=10)
-# table(cv_preds, iris$Species)
+#' cv_preds <- iqnn_cv_predict(data=iris, y="Species",mod_type="class", bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
+#'              nbins=c(3,5,2), jit=rep(0.001,3), strict=FALSE, cv_k=10)
+#' table(cv_preds, iris$Species)
 
 iqnn_cv_predict <- function(data, y, mod_type="reg", bin_cols, nbins, jit=rep(0,length(bin_cols)), stretch=FALSE, tol=rep(0,length(bin_cols)), strict=FALSE, cv_k=10){
   data <- as.data.frame(data)
