@@ -57,7 +57,7 @@ iqbin <- function(data, bin_cols, nbins, jit = rep(0,length(bin_cols)), output="
                                                           nrow=nbins[d],byrow=FALSE)
       bin_centers[b:(b+nbins[d]-1),d] <- matrix(step_bin_info$bin_centers, nrow=nbins[d])
       bin_data[in_bin_b,d] <- step_bin_info$bin_data
-      if(sum(jit>0)>0) bin_jit[,d] <- step_bin_info$jit_values
+      if(sum(jit>0)>0) bin_jit[in_bin_b,d] <- step_bin_info$jit_values
     }
   }
   # add bin index column to bin_data
