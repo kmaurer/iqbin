@@ -98,7 +98,7 @@ iqnn_predict <- function(iqnn_mod,test_data, type="estimate",strict=FALSE){
 iqnn_cv_predict <- function(data, y, mod_type="reg", bin_cols, nbins, jit=rep(0,length(bin_cols)), stretch=FALSE, tol=rep(0,length(bin_cols)), strict=FALSE, cv_k=10){
   data <- as.data.frame(data)
   cv_cohorts <- make_cv_cohorts(data, cv_k)
-  cv_preds <- rep(NA,nrow(data))
+  cv_preds <- factor(rep("NA", nrow(data)),levels(data[, y]))
   for(fold in 1:length(unique(cv_cohorts))){
     test_index <- which(cv_cohorts==fold)
     train_data_temp <- data[-test_index,]

@@ -183,7 +183,7 @@ round_df <- function(x, digits=2) {
 #' majority_vote(votes)
 #' 
 majority_vote <- function(votes){
-  top_votes <- names(which.max(table(votes))) # collect top vote earner (ties allowed)
+  top_votes <- names(which.max(table(as.character(votes)))) # collect top vote earner (ties allowed)
   return(sample(top_votes,1)) # randomly select to break any ties for best
 }
 
