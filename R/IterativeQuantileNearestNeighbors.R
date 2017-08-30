@@ -107,7 +107,7 @@ iqnn_cv_predict <- function(data, y, mod_type="reg", bin_cols, nbins, jit=rep(0,
                      nbins=nbins, jit=jit,stretch=stretch, tol=tol)
     cv_preds[test_index] <- iqnn_predict(iqnn_mod, data[test_index,],strict=strict, type="estimate")
   }
-  if(mod_type=="class") cv_preds <- factor(cv_preds, labels=levels(data[,y]))
+  # if(mod_type=="class") cv_preds <- factor(cv_preds, labels=levels(data[,y]))
   cv_preds
 }
 
