@@ -24,6 +24,7 @@ iqnn <- function(data, y, mod_type="reg", bin_cols, nbins, jit = rep(0,length(bi
   iq_bin <- iqbin(data, bin_cols, nbins, output="both",jit)
   if(stretch) iq_bin <- iqbin_stretch(iq_bin, tol=tol)
   iq_bin$bin_def$y <- y
+  iq_bin$bin_def$mod_type <- mod_type
   total_bins = nrow(iq_bin$bin_def$bin_centers)
   if(mod_type=="reg"){
     iq_bin$bin_def$bin_stats <- data.frame(pred = sapply(1:total_bins, function(b) mean(data[iq_bin$bin_data$bin_data$bin_index==b,y], na.rm=TRUE)),
