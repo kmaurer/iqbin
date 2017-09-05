@@ -11,6 +11,7 @@
 #' @param jit non-negative value to specify a random uniform jitter to the observed values prior to partitioning by quantiles.
 #'
 #' @return output as specified
+#' @export
 #' @examples
 #' quant_bin_1d(ggplot2::diamonds$price,4,output="data")
 #' quant_bin_1d(ggplot2::diamonds$price,4,output="definition")
@@ -51,6 +52,7 @@ quant_bin_1d <- function(xs, nbin, output="data",jit=0){
 #' @param nbins number of bins in each dimension
 #' 
 #' @return R-tree nested list of bin boundaries
+#' @export
 #' @examples 
 #' iq_def <- iqbin(data=iris, bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
 #'                     nbins=c(3,2,2), output="definition",jit=rep(0.001,3))
@@ -96,6 +98,7 @@ make_bin_list <- function(bin_bounds,nbins){
 #' @param strict TRUE/FALSE: If TRUE Observations must fall within existing bins to be assigned; if FALSE the outer bins in each dimension are unbounded to allow outlying values to be assigned.
 #' 
 #' @return bin index for new observation
+#' @export
 #' @examples 
 #' iq_def <- iqbin(data=iris[-test_index,], bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
 #'                               nbins=c(3,2,2), output="both")
@@ -126,6 +129,7 @@ bin_index_finder_nest <- function(x, bin_def, strict=TRUE){
 #' @param M number of duplicates
 #' 
 #' @return bin index for new observation
+#' @export
 #' @examples 
 #' make_stack_matrix(3,4)
 
@@ -144,6 +148,7 @@ make_stack_matrix <- function(N,M){
 #' @param cv_K number of folds needed in indexing
 #' 
 #' @return Vector of fold indeces
+#' @export
 #' @examples 
 #' make_cv_cohorts(iris,cv_K=10)
 make_cv_cohorts <- function(dat,cv_K){
@@ -164,6 +169,7 @@ make_cv_cohorts <- function(dat,cv_K){
 #' @param digits number of digits to round
 #' 
 #' @return data frame with rounded numeric variables
+#' @export
 #' @examples 
 #' round_df(head(faithful),digits=1)
 
@@ -179,9 +185,11 @@ round_df <- function(x, digits=2) {
 #' @description Identify the maximum vote earners, then randomly pick winner if there is a tie to break
 #'
 #' @param votes character or factor vector
+#' @export
+#' @examples 
 #' votes <- c("a","a","a","b","b","c")
 #' majority_vote(votes)
-#' 
+
 majority_vote <- function(votes){
   top_votes <- names(which.max(table(as.character(votes)))) # collect top vote earner (ties allowed)
   return(sample(top_votes,1)) # randomly select to break any ties for best
@@ -196,6 +204,7 @@ majority_vote <- function(votes){
 #' @param p number of binning dimensions
 #' 
 #' @return list of nbins vectors
+#' @export
 #' @examples 
 #' make_nbins_list(c(2,4),3)
 

@@ -23,6 +23,7 @@
 #'
 #' @return output list containing values specified by user
 #' @family iterative quantile binning functions
+#' @export
 #' @examples
 #' iqbin(data=iris, bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
 #'                     nbins=c(3,5,2), output="both",jit=rep(0.001,3))
@@ -92,6 +93,7 @@ iqbin <- function(data, bin_cols, nbins, jit = rep(0,length(bin_cols)), output="
 #'
 #' @return updated binning definition list with outermost bin boundaries extended by tolerance values
 #' @family iterative quantile binning functions
+#' @export
 #' @examples
 #' iq_def <- iqbin(data=iris, bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
 #'                              nbins=c(3,2,2), output="both")
@@ -131,6 +133,7 @@ iqbin_stretch <- function(iq_def, tol){
 #'
 #' @return list of new_data, binned data and indecies. Optionally the bin definition may also be included
 #' @family iterative quantile binning functions
+#' @export
 #' @examples
 #' withhold_index <- c(1,2,51,52,101,102)
 #' iq_def <- iqbin(data=iris[-withhold_index,], bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),

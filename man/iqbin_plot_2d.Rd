@@ -15,3 +15,6 @@ create ggplot2 object with iq bins displayed
 \description{
 used for binning the numeric values by empirical quantile
 }
+\examples{
+2+2
+}

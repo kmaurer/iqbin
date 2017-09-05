@@ -15,6 +15,8 @@
 #' 
 #' @return list containing binned training data, binning definition, and bin statistics
 #' @family iterative quantile nearest-neighbors functions
+#' @export
+#' 
 #' @examples 
 #' iqnn_mod <- iqnn(data=iris, y="Species", mod_type="class", bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
 #'                  nbins=c(3,5,2), jit=rep(0.001,3), tol = rep(0.001,3))
@@ -50,6 +52,7 @@ iqnn <- function(data, y, mod_type="reg", bin_cols, nbins, jit = rep(0,length(bi
 #' 
 #' @return predicted responses, number of neighbors or both
 #' @family iterative quantile nearest-neighbors functions
+#' @export
 #' @examples 
 #' # Test Regression
 #' test_index <- c(1,2,51,52,101,102)
@@ -94,6 +97,7 @@ iqnn_predict <- function(iqnn_mod,test_data, type="estimate",strict=FALSE){
 #' 
 #' @return cross validated predicted responses for all observations in data
 #' @family iterative quantile nearest-neighbors functions
+#' @export
 #' @examples 
 #' cv_preds <- iqnn_cv_predict(data=iris, y="Species",mod_type="class", bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
 #'              nbins=c(3,5,2), jit=rep(0.001,3), strict=FALSE, cv_k=10)
@@ -134,6 +138,7 @@ iqnn_cv_predict <- function(data, y, mod_type="reg", bin_cols, nbins, jit=rep(0,
 #' 
 #' @return data frame with one row per binning specification with desriptive and performance statistics: bin dimensitions, number of bins, equivalent k-nearest neightbor size, performance (mean squared error or class error rate)
 #' @family iterative quantile nearest-neighbors functions
+#' @export
 #' @examples 
 #' # 10-fold CV
 #' cv_tune1 <- iqnn_tune(data=iris, y="Petal.Length", bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
