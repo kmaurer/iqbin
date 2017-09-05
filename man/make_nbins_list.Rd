@@ -15,8 +15,8 @@ make_nbins_list(nbin_range, p)
 list of nbins vectors
 }
 \description{
-create a list of nbins vectors, use progression that increases number of bins in each dimension while always staying balanced between dimensions
+create a list of nbins vectors, use progression that increases number of bins in each dimension while always staying balanced between dimensions.
 }
 \examples{
-make_nbins_list(c(2,3),3)
+make_nbins_list(c(2,4),3)
 }

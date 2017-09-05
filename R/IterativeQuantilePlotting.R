@@ -9,20 +9,20 @@
 #'
 #' @return create ggplot2 object with iq bins displayed
 #' @examples
-iq_obj1 <- iqbin(data=iris, bin_cols=c("Sepal.Length","Sepal.Width"),
-nbins=c(5,3), output="both",jit=rep(0.1,2))
-str(iq_obj1)
-class(iq_obj1)
-
-iq_obj2 <- iqnn(data=iris, y="Species", mod_type="class", bin_cols=c("Sepal.Length","Sepal.Width"),
-               nbins=c(5,3), jit=rep(0.001,2))
-str(iq_obj2)
-class(iq_obj2)
-
-iq_obj <- iqnn(data=iris, y="Petal.Length", mod_type="reg", bin_cols=c("Sepal.Length","Sepal.Width"),
-                nbins=c(5,3), jit=rep(0.001,2))
-str(iq_obj)
-class(iq_obj)
+# iq_obj1 <- iqbin(data=iris, bin_cols=c("Sepal.Length","Sepal.Width"),
+# nbins=c(5,3), output="both",jit=rep(0.1,2))
+# str(iq_obj1)
+# class(iq_obj1)
+# 
+# iq_obj2 <- iqnn(data=iris, y="Species", mod_type="class", bin_cols=c("Sepal.Length","Sepal.Width"),
+#                nbins=c(5,3), jit=rep(0.001,2))
+# str(iq_obj2)
+# class(iq_obj2)
+# 
+# iq_obj <- iqnn(data=iris, y="Petal.Length", mod_type="reg", bin_cols=c("Sepal.Length","Sepal.Width"),
+#                 nbins=c(5,3), jit=rep(0.001,2))
+# str(iq_obj)
+# class(iq_obj)
 
 iqbin_plot_2d <- function(iq_obj){
   if(class(iq_obj)=="iqbin"){
@@ -50,20 +50,20 @@ iqbin_plot_2d <- function(iq_obj){
 }
 
 
-iq_obj <- iqbin(data=iris, bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
-nbins=c(2,5,3), output="both",jit=rep(0.1,3))
-str(iq_obj)
-class(iq_obj)
-
-iq_obj <- iqnn(data=iris, y="Species", mod_type="class", bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
-               nbins=c(2,5,3), jit=rep(0.001,3))
-str(iq_obj)
-class(iq_obj)
-
-iq_obj <- iqnn(data=iris, y="Petal.Length", mod_type="reg", bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
-               nbins=c(2,5,3), jit=rep(0.001,3))
-str(iq_obj)
-class(iq_obj)
+# iq_obj <- iqbin(data=iris, bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
+# nbins=c(2,5,3), output="both",jit=rep(0.1,3))
+# str(iq_obj)
+# class(iq_obj)
+# 
+# iq_obj <- iqnn(data=iris, y="Species", mod_type="class", bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
+#                nbins=c(2,5,3), jit=rep(0.001,3))
+# str(iq_obj)
+# class(iq_obj)
+# 
+# iq_obj <- iqnn(data=iris, y="Petal.Length", mod_type="reg", bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
+#                nbins=c(2,5,3), jit=rep(0.001,3))
+# str(iq_obj)
+# class(iq_obj)
 
 iqbin_plot_3d <- function(iq_obj, round_digits=2){
   if(class(iq_obj)=="iqbin"){

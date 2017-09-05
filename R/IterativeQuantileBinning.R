@@ -21,7 +21,8 @@
 #' @param jit vector of margins for uniform jitter to each dimension to create seperability of tied obs due to finite precision
 #' @param output Output Structure: "data" for just the binned data,"definition" for a list of bin centers and boundaries, or "both" for list containing both data and definition
 #'
-#' @return output as specified
+#' @return output list containing values specified by user
+#' @family iterative quantile binning functions
 #' @examples
 #' iqbin(data=iris, bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
 #'                     nbins=c(3,5,2), output="both",jit=rep(0.001,3))
@@ -82,14 +83,15 @@ iqbin <- function(data, bin_cols, nbins, jit = rep(0,length(bin_cols)), output="
 }
 
 #--------------------------------------
-#' Adding Tolerance Buffer to outermost bins from Iterative Quantile Binning
+#' Stretching to Add Tolerance Buffer to outermost Iterative Quantile Bins
 #'
-#' @description New observations selected from the same population as the data used to build bin definitions may fall just outside the bins. If we wish to include nearby values we can either allow outer bins to be extended (this function) or to leave the outer bins unbounded.
+#' @description We may wish to include values just outside the constructed bins in future applications. \code{iqbin_stretch} redefines the outermost bin in each dimension from a definition created by \code{\link{iqbin}}
 #'
-#' @param iq_def  iterative quantile binning definition list
+#' @param iq_def  iterative quantile binning definition list from \code{\link{iqbin}} function
 #' @param tol vector of tolerance values to stretch each dimension for future binning
 #'
-#' @return updated binning definition with bins extended by tolerance values
+#' @return updated binning definition list with outermost bin boundaries extended by tolerance values
+#' @family iterative quantile binning functions
 #' @examples
 #' iq_def <- iqbin(data=iris, bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
 #'                              nbins=c(3,2,2), output="both")
@@ -118,16 +120,17 @@ iqbin_stretch <- function(iq_def, tol){
 }
 
 #--------------------------------------
-#' Iterative Quantile Binning New Data from defined bins
+#' Assigning New observations to Existing Iterative Quantile Bins
 #'
-#' @description New observations selected from the same population as the data used to build bin definitions may fall just outside the bins. If we wish to include nearby values we can either allow outer bins to be extended (this function) or to leave the outer bins unbounded.
+#' @description Assigning New observations to Existing Iterative Quantile Bins by using binning definition created by \code{\link{iqbin}} function 
 #'
-#' @param iq_def Iterative quantile binning definition list
+#' @param iq_def Iterative quantile binning definition list as output from \code{\link{iqbin}} function
 #' @param new_data Data frame with column names matching the binned columns from bin-training data
-#' @param output Matches format of iqbin and inherets properties from iqnn if applicable {"data","both"}
+#' @param output Matches format of \code{\link{iqbin}} and inherets properties from \code{\link{iqnn}} if applicable {"data","both"}
 #' @param strict TRUE/FALSE: If TRUE Observations must fall within existing bins to be assigned; if FALSE the outer bins in each dimension are unbounded to allow outlying values to be assigned.
 #'
-#' @return updated binning definition with bins extended by tolerance values
+#' @return list of new_data, binned data and indecies. Optionally the bin definition may also be included
+#' @family iterative quantile binning functions
 #' @examples
 #' withhold_index <- c(1,2,51,52,101,102)
 #' iq_def <- iqbin(data=iris[-withhold_index,], bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),

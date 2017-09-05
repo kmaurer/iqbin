@@ -40,3 +40,7 @@ cv_preds <- iqnn_cv_predict(data=iris, y="Species",mod_type="class", bin_cols=c(
              nbins=c(3,5,2), jit=rep(0.001,3), strict=FALSE, cv_k=10)
 table(cv_preds, iris$Species)
 }
+\seealso{
+Other iterative quantile nearest-neighbors functions: \code{\link{iqnn_predict}},
+  \code{\link{iqnn_tune}}, \code{\link{iqnn}}
+}

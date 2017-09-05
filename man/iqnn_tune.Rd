@@ -33,7 +33,8 @@ iqnn_tune(data, y, mod_type = "reg", bin_cols, nbins_range, jit = rep(0,
 data frame with one row per binning specification with desriptive and performance statistics: bin dimensitions, number of bins, equivalent k-nearest neightbor size, performance (mean squared error or class error rate)
 }
 \description{
-Identify optimal number of bins per dimension for iterative quantile nearest-neighbor model using k-fold cross validation
+Identify optimal number of bins per dimension for iterative quantile nearest-neighbor model using k-fold cross validation. 
+Search through possible numbers of bins per dimension using a iterative rules defined in the \code{\link{make_nbins_list}} function.
 }
 \examples{
 # 10-fold CV
@@ -44,4 +45,8 @@ cv_tune1
 cv_tune2 <- iqnn_tune(data=iris, y="Petal.Length", bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
                       nbins_range=c(2,5), jit=rep(0.001,3), strict=FALSE, cv_k=nrow(iris))
 cv_tune2
+}
+\seealso{
+Other iterative quantile nearest-neighbors functions: \code{\link{iqnn_cv_predict}},
+  \code{\link{iqnn_predict}}, \code{\link{iqnn}}
 }

@@ -190,14 +190,14 @@ majority_vote <- function(votes){
 #--------------------------------------
 #' Function to create list of nbins vectors to put into tuning iqnn 
 #'
-#' @description create a list of nbins vectors, use progression that increases number of bins in each dimension while always staying balanced between dimensions
+#' @description create a list of nbins vectors, use progression that increases number of bins in each dimension while always staying balanced between dimensions. 
 #'
 #' @param nbin_range positive integer vector containing lower and upper bounds on number of bins in each dimension
 #' @param p number of binning dimensions
 #' 
 #' @return list of nbins vectors
 #' @examples 
-#' make_nbins_list(c(2,3),3)
+#' make_nbins_list(c(2,4),3)
 
 make_nbins_list <- function(nbin_range, p){
   nbins_list <- list(rep(nbin_range[1],p))

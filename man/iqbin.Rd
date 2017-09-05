@@ -19,7 +19,7 @@ iqbin(data, bin_cols, nbins, jit = rep(0, length(bin_cols)),
 \item{output}{Output Structure: "data" for just the binned data,"definition" for a list of bin centers and boundaries, or "both" for list containing both data and definition}
 }
 \value{
-output as specified
+output list containing values specified by user
 }
 \description{
 used for binning the numeric values by empirical quantile
@@ -29,4 +29,8 @@ iqbin(data=iris, bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
                     nbins=c(3,5,2), output="both",jit=rep(0.001,3))
 iqbin(data=iris, bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
                     nbins=c(3,5,2), output="data")
+}
+\seealso{
+Other iterative quantile binning functions: \code{\link{iqbin_assign}},
+  \code{\link{iqbin_stretch}}
 }

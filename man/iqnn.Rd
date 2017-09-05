@@ -35,3 +35,7 @@ iqnn_mod <- iqnn(data=iris, y="Species", mod_type="class", bin_cols=c("Sepal.Len
                  nbins=c(3,5,2), jit=rep(0.001,3), tol = rep(0.001,3))
 str(iqnn_mod)
 }
+\seealso{
+Other iterative quantile nearest-neighbors functions: \code{\link{iqnn_cv_predict}},
+  \code{\link{iqnn_predict}}, \code{\link{iqnn_tune}}
+}
