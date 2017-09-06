@@ -74,12 +74,14 @@ iqbin <- function(data, bin_cols, nbins, jit = rep(0,length(bin_cols)), output="
   #
   bin_list <- make_bin_list(bin_bounds,nbins)
   if(output=="data") iqbin_obj <- list(data=data,bin_data=bin_data,bin_jit=bin_jit)
-  if(output=="definition") iqbin_obj <- list(bin_centers=bin_centers, bin_bounds=bin_bounds, bin_cols=bin_cols, nbins=nbins, jit=jit, bin_list=bin_list)
+  if(output=="definition") {
+    iqbin_obj <- list(bin_centers=bin_centers, bin_bounds=bin_bounds, bin_cols=bin_cols, nbins=nbins, jit=jit, bin_list=bin_list)
+  }
   if(output=="both"){
     iqbin_obj <- list(bin_data=list(data=data,bin_data=bin_data,bin_jit=bin_jit),
                 bin_def=list(bin_centers=bin_centers, bin_bounds=bin_bounds, bin_cols=bin_cols, nbins=nbins, jit=jit, bin_list=bin_list))
+    attributes(iqbin_obj)$iq_obj_type <- "iqbin"
   }
-  class(iqbin_obj) <- "iqbin"
   return(iqbin_obj)
 }
 

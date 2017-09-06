@@ -36,7 +36,7 @@ iqnn <- function(data, y, mod_type="reg", bin_cols, nbins, jit = rep(0,length(bi
     iq_bin$bin_def$bin_stats <- data.frame(pred = sapply(1:total_bins, function(b) majority_vote(data[iq_bin$bin_data$bin_data$bin_index==b,y])),
                                            obs = sapply(1:total_bins, function(b) sum(iq_bin$bin_data$bin_data$bin_index==b)) )
   }else{return(print("mod_type must be either 'reg' or 'class'"))}
-  class(iq_bin$bin_def) <- "iqnn"
+  attributes(iq_bin$bin_def)$iq_obj_type <- "iqnn"
   return(iq_bin$bin_def)
 }
 
