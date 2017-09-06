@@ -148,8 +148,9 @@ iqbin_assign <- function(bin_def, new_data, output="data", strict=FALSE){
   #
   # loop over each obs in new data, identify the bin indeces then return bin centers for associated bins
   bin_indeces <- sapply(1:nrow(new_data), function(i){
-    # bin_index_finder(new_data[i,iq_def$bin_cols],iq_def$bin_bounds, iq_def$nbins, strict=strict)
-    bin_index_finder_nest(new_data[i,bin_def$bin_cols],bin_def, strict=strict)
+    val <- bin_index_finder_nest(new_data[i,bin_def$bin_cols],bin_def, strict=strict)
+    if(is.null(val)) val = NA
+    return(val)
   })
 
   if(output=="data") return(list(data=new_data,bin_data=bin_def$bin_centers[bin_indeces,],bin_indeces=bin_indeces))

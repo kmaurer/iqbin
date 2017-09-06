@@ -56,23 +56,20 @@ iqnn <- function(data, y, mod_type="reg", bin_cols, nbins, jit = rep(0,length(bi
 #' @examples 
 #' # Test Regression
 #' test_index <- c(1,2,51,52,101,102)
-#' iqnn_mod <- iqnn(iris[-test_index,], y="Petal.Length", bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
-#'                  nbins=c(3,5,2), jit=rep(0.001,3), stretch=TRUE, tol=rep(.2,3))
+#' iqnn_mod <- iqnn(iris[-test_index,], y="Petal.Length", bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"), nbins=c(3,5,2), jit=rep(0.001,3), stretch=TRUE, tol=rep(.001,3))
 #' test_data <- iris[test_index,]
 #' iqnn_predict(iqnn_mod, test_data,strict=FALSE)
 #' iqnn_predict(iqnn_mod, test_data,strict=TRUE)
 #' iqnn_predict(iqnn_mod, test_data,type="both")
 #' 
 #' # Test Classifier
-#' iqnn_mod <- iqnn(data=iris[-test_index,], y="Species", mod_type="class", bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
-#'                  nbins=c(3,5,2), jit=rep(0.001,3), tol = rep(0.001,3))
+#' iqnn_mod <- iqnn(data=iris[-test_index,], y="Species", mod_type="class", bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"), nbins=c(3,5,2), jit=rep(0.001,3))
 #' test_data <- iris[test_index,]
-#' iqnn_predict(iqnn_mod, test_data,strict=FALSE)
+#' iqnn_predict(iqnn_mod, test_data,strict=TRUE)
 #' iqnn_predict(iqnn_mod, test_data,type="both",strict=FALSE)
 
 iqnn_predict <- function(iqnn_mod,test_data, type="estimate",strict=FALSE){
   test_data <- as.data.frame(test_data)
-  #!# has bugs when strict=TRUE
   test_bin <- iqbin_assign(iqnn_mod, test_data, output="data",strict=strict)
   if(type=="estimate") return(iqnn_mod$bin_stats$pred[test_bin$bin_indeces])
   if(type=="binsize") return(iqnn_mod$bin_stats$obs[test_bin$bin_indeces])
