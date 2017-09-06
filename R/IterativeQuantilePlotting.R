@@ -13,78 +13,79 @@
 iqbin_plot_2d <- function(iq_obj){
   if(class(iq_obj)=="iqbin"){
     bounds <- as.data.frame(iq_obj$bin_def$bin_bounds)
-    train <- iq_obj$bin_data$data[,iq_obj$bin_def$bin_cols]
-    bin_jit <- iq_obj$bin_data$bin_jit
-    train_jit <- train + bin_jit
+    train_jit <- iq_obj$bin_data$data[,iq_obj$bin_def$bin_cols] + iq_obj$bin_data$bin_jit
+    bin_cols <- iq_obj$bin_def$bin_cols
   }
-  if(class(iq_obj)=="iqnn") bounds <- data.frame(as.data.frame(iq_obj$bin_bounds),iq_obj$bin_stats)
+  if(class(iq_obj)=="iqnn"){
+    bounds <- data.frame(as.data.frame(iq_obj$bin_bounds),iq_obj$bin_stats)
+    bin_cols <- iq_obj$bin_cols
+  }
   
-  p1 <- ggplot() +
-    theme_bw()
+  p1 <- ggplot2::ggplot() 
   if(class(iq_obj)=="iqbin"){
-    p1 <- p1 + geom_rect(aes(xmin=V1, xmax=V2, ymin=V3, ymax=V4),color="black",fill=NA, data=bounds)+
-      geom_point(aes_string(x=iq_obj$bin_def$bin_cols[1],
-                                     y=iq_obj$bin_def$bin_cols[2]), 
-                          data=train_jit)
+    p1 <- p1 + ggplot2::geom_rect(ggplot2::aes(xmin=V1, xmax=V2, ymin=V3, ymax=V4), data=bounds,color="black",fill=NA)+
+      ggplot2::geom_point(ggplot2::aes_string(x=bin_cols[1],y=bin_cols[2]),data=train_jit)
   } 
   if(class(iq_obj)=="iqnn"){
-    p1 <- p1 + geom_rect(aes(xmin=V1, xmax=V2, ymin=V3, ymax=V4,fill=pred),color="black", data=bounds)+
-      labs(x=iq_obj$bin_cols[1],y=iq_obj$bin_cols[2])
-    if(iq_obj$mod_type=="reg") p1 <- p1 + scale_fill_continuous(paste0("Predicted \n",iq_obj$y),low="gray90",high="gray20")
+    p1 <- p1 + ggplot2::geom_rect(ggplot2::aes(xmin=V1, xmax=V2, ymin=V3, ymax=V4,fill=pred), data=bounds,color="black")+
+      ggplot2::labs(x=bin_cols[1],y=bin_cols[2])
+    if(iq_obj$mod_type=="class") p1 <- p1 + ggplot2::scale_fill_discrete(paste0("Predicted \n",iq_obj$y))
+    if(iq_obj$mod_type=="reg") p1 <- p1 + ggplot2::scale_fill_continuous(paste0("Predicted \n",iq_obj$y),low="gray90",high="gray20")
   } 
   p1
 }
-# iq_obj1 <- iqbin(data=iris, bin_cols=c("Sepal.Length","Sepal.Width"),
-# nbins=c(5,3), output="both",jit=rep(0.1,2))
-# str(iq_obj1)
-# class(iq_obj1)
-# 
-# iq_obj2 <- iqnn(data=iris, y="Species", mod_type="class", bin_cols=c("Sepal.Length","Sepal.Width"),
-#                nbins=c(5,3), jit=rep(0.001,2))
-# str(iq_obj2)
-# class(iq_obj2)
-# 
-# iq_obj <- iqnn(data=iris, y="Petal.Length", mod_type="reg", bin_cols=c("Sepal.Length","Sepal.Width"),
-#                 nbins=c(5,3), jit=rep(0.001,2))
-# str(iq_obj)
-# class(iq_obj)
+iq_obj <- iqbin(data=iris, bin_cols=c("Sepal.Length","Sepal.Width"),
+                nbins=c(5,3), output="both",jit=rep(0.1,2))
+iqbin_plot_2d(iq_obj)
 
-# iq_obj <- iqbin(data=iris, bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
-# nbins=c(2,5,3), output="both",jit=rep(0.1,3))
-# str(iq_obj)
-# class(iq_obj)
-# 
-# iq_obj <- iqnn(data=iris, y="Species", mod_type="class", bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
-#                nbins=c(2,5,3), jit=rep(0.001,3))
-# str(iq_obj)
-# class(iq_obj)
-# 
-# iq_obj <- iqnn(data=iris, y="Petal.Length", mod_type="reg", bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
-#                nbins=c(2,5,3), jit=rep(0.001,3))
-# str(iq_obj)
-# class(iq_obj)
+iq_obj <- iqbin(data=iris, bin_cols=c("Sepal.Length","Sepal.Width"),
+                nbins=c(5,3), output="both")
+iqbin_plot_2d(iq_obj)
+
+
+iq_obj <- iqnn(data=iris, y="Species", mod_type="class", bin_cols=c("Sepal.Length","Sepal.Width"),
+               nbins=c(5,3), jit=rep(0.001,2))
+iqbin_plot_2d(iq_obj)
+
+
+iq_obj <- iqnn(data=iris, y="Petal.Length", mod_type="reg", bin_cols=c("Sepal.Length","Sepal.Width"),
+                nbins=c(5,3), jit=rep(0.001,2))
+iqbin_plot_2d(iq_obj)
+
+
+iq_obj <- iqbin(data=iris, bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
+nbins=c(2,5,3), output="both",jit=rep(0.1,3))
+iqbin_plot_3d(iq_obj)
+
+iq_obj <- iqnn(data=iris, y="Species", mod_type="class", bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
+               nbins=c(2,5,3), jit=rep(0.001,3))
+iqbin_plot_3d(iq_obj)
+
+iq_obj <- iqnn(data=iris, y="Petal.Length", mod_type="reg", bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
+               nbins=c(2,5,3), jit=rep(0.001,3))
+iqbin_plot_3d(iq_obj)
 
 iqbin_plot_3d <- function(iq_obj, round_digits=2){
   if(class(iq_obj)=="iqbin"){
+    bin_cols <- iq_obj$bin_def$bin_cols
     bounds <- as.data.frame(iq_obj$bin_def$bin_bounds)
-    bounds$x1 <- paste0(iq_obj$bin_cols[1]," in (",round(bounds$V1,round_digits),",",round(bounds$V2,round_digits),"]")
-    bounds$x1 <- factor(bounds$x1, levels=unique(bounds$x1))
-    train <- iq_obj$bin_data$data[,iq_obj$bin_def$bin_cols]
-    bin_jit <- iq_obj$bin_data$bin_jit
-    train_jit <- train + bin_jit
+    train_jit <- iq_obj$bin_data$data[,bin_cols] + iq_obj$bin_data$bin_jit
+    tra
   }
   if(class(iq_obj)=="iqnn") {
+    bin_cols <- iq_obj$bin_cols
     bounds <- data.frame(as.data.frame(iq_obj$bin_bounds),iq_obj$bin_stats)
-    bounds$x1 <- paste0(iq_obj$bin_cols[1]," in (",round(bounds$V1,round_digits),",",round(bounds$V2,round_digits),"]")
-    bounds$x1 <- factor(bounds$x1, levels=unique(bounds$x1))
   }
+  lower_bounds <- c(rep("[",sum(bounds$V1==min(bounds$V1))),rep("(",nrow(bounds)-sum(bounds$V1==min(bounds$V1))))
+  bounds$x1 <- paste0(bin_cols[1]," in ",lower_bounds,round(bounds$V1,round_digits),",",round(bounds$V2,round_digits),"]")
+  bounds$x1 <- factor(bounds$x1, levels=unique(bounds$x1))
   
   p1 <- ggplot() +
     theme_bw()
   if(class(iq_obj)=="iqbin"){
-    p1 <- p1 + geom_rect(aes(xmin=V1, xmax=V2, ymin=V3, ymax=V4),color="black",fill=NA, data=bounds)+
-      geom_point(aes_string(x=iq_obj$bin_def$bin_cols[1],
-                            y=iq_obj$bin_def$bin_cols[2]), 
+    p1 <- p1 + geom_rect(aes(xmin=V3, xmax=V4, ymin=V5, ymax=V6),color="black",fill=NA, data=bounds)+
+      facet_grid(.~x1)+
+      geom_point(aes_string(x=iq_obj$bin_def$bin_cols[2],y=iq_obj$bin_def$bin_cols[3]), 
                  data=train_jit)
   } 
   if(class(iq_obj)=="iqnn"){
