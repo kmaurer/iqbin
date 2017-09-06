@@ -3,6 +3,8 @@
 export(bin_index_finder_nest)
 export(iqbin)
 export(iqbin_assign)
+export(iqbin_plot_2d)
+export(iqbin_plot_3d)
 export(iqbin_stretch)
 export(iqnn)
 export(iqnn_cv_predict)
