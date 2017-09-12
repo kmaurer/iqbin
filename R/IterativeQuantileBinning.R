@@ -30,7 +30,7 @@
 #' iqbin(data=iris, bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
 #'                     nbins=c(3,5,2), output="data")
 iqbin <- function(data, bin_cols, nbins, jit = rep(0,length(bin_cols)), output="data"){
-  data <- as.data.frame(data)
+  data <- as.data.frame(data) #!# remove someday to improve speed (keep to avoid tibble problems now)
   # row.names(data) <- 1:nrow(data)
   bin_dim <- length(bin_cols)
   bin_data <- matrix(NA,nrow=nrow(data),ncol=bin_dim, dimnames=list(row.names(data),paste(bin_cols,"binned",sep="_")))
@@ -63,15 +63,18 @@ iqbin <- function(data, bin_cols, nbins, jit = rep(0,length(bin_cols)), output="
     }
   }
   # add bin index column to bin_data
-  bin_centers_idx <- as.data.frame(bin_centers)
-  bin_data_idx <- as.data.frame(bin_data)
-  names(bin_centers_idx) <- colnames(bin_data)
-  bin_centers_idx$bin_index <- 1:nrow(bin_centers_idx)
-  bin_data_idx$order <- 1:nrow(bin_data_idx)
-  bin_data <- merge(round_df(bin_data_idx,10),round_df(bin_centers_idx,10), all.x=TRUE)
-  bin_data <- bin_data[order(bin_data$order),]
-  row.names(bin_data) <- 1:nrow(bin_data)
-  #
+  #!# I think there must be a more efficient way of doing this, find it
+  if(output!="definition"){
+    bin_centers_idx <- as.data.frame(bin_centers)
+    bin_data_idx <- as.data.frame(bin_data)
+    names(bin_centers_idx) <- colnames(bin_data)
+    bin_centers_idx$bin_index <- 1:nrow(bin_centers_idx)
+    bin_data_idx$order <- 1:nrow(bin_data_idx)
+    bin_data <- merge(round_df(bin_data_idx,10),round_df(bin_centers_idx,10), all.x=TRUE) #!# rounding digits potentially problematic
+    bin_data <- bin_data[order(bin_data$order),]
+    row.names(bin_data) <- 1:nrow(bin_data)
+  }
+  # Create list tree structure for fast queries
   bin_list <- make_bin_list(bin_bounds,nbins)
   if(output=="data") iqbin_obj <- list(data=data,bin_data=bin_data,bin_jit=bin_jit)
   if(output=="definition") {
