@@ -109,6 +109,7 @@ bin_index_finder_nest <- function(x, bin_def, strict=TRUE){
   nest_list <- bin_def$bin_list[[1]]
   x <- as.numeric(x)
     for(d in 1:bin_dim){
+      #!# check if .bincode is most efficient possible approach
       nest_index <- .bincode(x[[d]], nest_list[[bin_def$nbins[d]+1]],T,T)
       if(strict == FALSE){
         if( x[[d]] < min(nest_list[[bin_def$nbins[d]+1]]) ) nest_index <- 1
