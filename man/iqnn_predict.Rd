@@ -24,18 +24,16 @@ Predict the response value for test data using iqnn model defined using training
 \examples{
 # Test Regression
 test_index <- c(1,2,51,52,101,102)
-iqnn_mod <- iqnn(iris[-test_index,], y="Petal.Length", bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
-                 nbins=c(3,5,2), jit=rep(0.001,3), stretch=TRUE, tol=rep(.2,3))
+iqnn_mod <- iqnn(iris[-test_index,], y="Petal.Length", bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"), nbins=c(3,5,2), jit=rep(0.001,3), stretch=TRUE, tol=rep(.001,3))
 test_data <- iris[test_index,]
 iqnn_predict(iqnn_mod, test_data,strict=FALSE)
 iqnn_predict(iqnn_mod, test_data,strict=TRUE)
 iqnn_predict(iqnn_mod, test_data,type="both")
 
 # Test Classifier
-iqnn_mod <- iqnn(data=iris[-test_index,], y="Species", mod_type="class", bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
-                 nbins=c(3,5,2), jit=rep(0.001,3), tol = rep(0.001,3))
+iqnn_mod <- iqnn(data=iris[-test_index,], y="Species", mod_type="class", bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"), nbins=c(3,5,2), jit=rep(0.001,3))
 test_data <- iris[test_index,]
-iqnn_predict(iqnn_mod, test_data,strict=FALSE)
+iqnn_predict(iqnn_mod, test_data,strict=TRUE)
 iqnn_predict(iqnn_mod, test_data,type="both",strict=FALSE)
 }
 \seealso{

@@ -146,7 +146,7 @@ iqbin_stretch <- function(iq_def, tol){
 #' iqbin_assign(bin_def=iq_def, new_data=iris[withhold_index,], output="data")
 
 iqbin_assign <- function(bin_def, new_data, output="data", strict=FALSE){
-  new_data <- as.data.frame(new_data)
+  # new_data <- as.data.frame(new_data)
   #!# need to introduce similar jitter to new data as in definition so "boundary" points allocated randomly
   #
   # loop over each obs in new data, identify the bin indeces then return bin centers for associated bins

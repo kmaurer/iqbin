@@ -16,21 +16,15 @@ create ggplot2 object with iq bins displayed
 used for binning the numeric values by empirical quantile
 }
 \examples{
-iq_obj <- iqbin(data=iris, bin_cols=c("Sepal.Length","Sepal.Width"),
-                nbins=c(5,3), output="both",jit=rep(0.1,2))
+iq_obj <- iqbin(data=iris, bin_cols=c("Sepal.Length","Sepal.Width"), nbins=c(5,3), output="both",jit=rep(0.1,2))
 iqbin_plot_2d(iq_obj)
 
-iq_obj <- iqbin(data=iris, bin_cols=c("Sepal.Length","Sepal.Width"),
-                nbins=c(5,3), output="both")
+iq_obj <- iqbin(data=iris, bin_cols=c("Sepal.Length","Sepal.Width"), nbins=c(5,3), output="both")
 iqbin_plot_2d(iq_obj)
 
-
-iq_obj <- iqnn(data=iris, y="Species", mod_type="class", bin_cols=c("Sepal.Length","Sepal.Width"),
-               nbins=c(5,3), jit=rep(0.001,2))
+iq_obj <- iqnn(data=iris, y="Species", mod_type="class", bin_cols=c("Sepal.Length","Sepal.Width"), nbins=c(5,3), jit=rep(0.001,2))
 iqbin_plot_2d(iq_obj)
 
-
-iq_obj <- iqnn(data=iris, y="Petal.Length", mod_type="reg", bin_cols=c("Sepal.Length","Sepal.Width"),
-                nbins=c(5,3), jit=rep(0.001,2))
+iq_obj <- iqnn(data=iris, y="Petal.Length", mod_type="reg", bin_cols=c("Sepal.Length","Sepal.Width"), nbins=c(5,3), jit=rep(0.001,2))
 iqbin_plot_2d(iq_obj)
 }
