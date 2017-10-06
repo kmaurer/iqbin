@@ -223,6 +223,36 @@ make_nbins_list <- function(nbin_range, p){
 }
 
 #--------------------------------------
+#' Function to turn indeces from p-dimensions into one set of unique indeces
+#'
+#' @description take p-dim indeces and convert fast/slow running indeces
+#'
+#' @param nbins number of bins in each dimension
+#' @param indeces p-dimensional indeces for bin
+#' 
+#' @return integer index unique to p-dim bin
+#' @export
+#' @examples 
+#' index_collapser(nbins=c(2,2,2),indeces=c(1,1,1))
+#' index_collapser(nbins=c(2,2,2),indeces=c(1,1,2))
+#' index_collapser(nbins=c(2,2,2),indeces=c(1,2,1))
+#' index_collapser(nbins=c(2,2,2),indeces=c(1,2,2))
+#' index_collapser(nbins=c(2,2,2),indeces=c(2,1,1))
+#' index_collapser(nbins=c(2,2,2),indeces=c(2,1,2))
+#' index_collapser(nbins=c(2,2,2),indeces=c(2,2,1))
+#' index_collapser(nbins=c(2,2,2),indeces=c(2,2,2))
+
+index_collapser <- function(nbins, indeces){
+  p = length(nbins)
+  bin_index <- indeces[p]
+  for(j in 1:(p-1)){
+    bin_index <- bin_index + (indeces[j]-1)*prod(nbins[j:(p-1)]) 
+  }
+  return(bin_index)
+}
+
+
+#--------------------------------------
 ### Helper function for suggesting parameters for jittering number of bins in each dimension
 # based on number of ties and data resolution
 #!#
