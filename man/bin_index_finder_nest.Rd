@@ -20,7 +20,8 @@ bin index for new observation
 Use R-tree structure using from make_bin_list() function to find bin index for new observation
 }
 \examples{
-iq_def <- iqbin(data=iris[-test_index,], bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
+iq_def <- iqbin(data=iris[,], bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
                               nbins=c(3,2,2), output="both")
-bin_index_finder_nest(x=c(6,3,1.5),bin_def=iq_def$bin_def, strict=TRUE)
+bin_index_finder_nest(x=c(6,3,1.5),bin_def=iq_def$bin_def , strict=TRUE)
+object.size(iq_def$bin_def$bin_list)
 }
