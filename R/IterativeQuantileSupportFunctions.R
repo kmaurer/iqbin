@@ -54,12 +54,61 @@ quant_bin_1d <- function(xs, nbin, output="data",jit=0){
 #' @return R-tree nested list of bin boundaries
 #' @export
 #' @examples 
+#' nbins=c(5,4,3,2)
+#' iq_def <- iqbin(data=iris, bin_cols=c("Sepal.Length","Sepal.Width","Petal.Length","Petal.Width"),
+#'                     nbins=nbins, output="definition",jit=rep(0.001,4))
+#' iq_def$bin_bounds
+#' make_bin_list(bin_bounds=iq_def$bin_bounds,nbins=nbins)
+
+make_bin_list <- function(bin_bounds,nbins){
+  bin_dim = length(nbins)
+  ### build nested list version of bin_bounds to speed up future searching for bins
+  upper_blocks <- prod(nbins[1:(bin_dim-1)])
+  lower_level_list <-lapply(1:upper_blocks, function(x){
+    list(unique(as.vector(bin_bounds[(x-1)*nbins[bin_dim] + 1:nbins[bin_dim],(bin_dim-1)*2+1:2])))
+  })
+  
+  # at each subsequent level higher in tree, bundle all lower_level_list objects associated with p-th dimensional interval l
+  for(p in (bin_dim-1):1){
+    upper_level_list <- NULL
+    
+    upper_blocks <- ifelse(p==1,1,prod(nbins[1:(p-1)]))
+    lower_block_size <- nbins[p]
+    upper_indeces <- prod(nbins[p:length(nbins)])
+    lower_indeces <- ifelse(p==bin_dim,1,prod(nbins[(p+1):bin_dim]))
+    
+    for(ul in 1:upper_blocks){
+      # create upper level groups 
+      upper_level_list[[ul]] <- list(NULL)
+      for(ll in 1:lower_block_size){
+        upper_level_list[[ul]][[ll]] <- lower_level_list[[(ul-1)*lower_block_size+ll]]
+      }
+      # upper_level_list[[ul]][[lower_block_size+1]] <- bin_bounds[(ul-1)*upper_indeces + 1:lower_block_size*lower_indeces,(d-1)*2+1:2]
+      upper_level_list[[ul]][[lower_block_size+1]] <- unique(as.vector(bin_bounds[(ul-1)*upper_indeces + 1:lower_block_size*lower_indeces,(p-1)*2+1:2]))
+    }
+    lower_level_list <- upper_level_list
+  }
+  bin_list <- lower_level_list
+  return(bin_list)
+}
+
+#--------------------------------------
+#' Convert bin bounds data frame into R-tree structure using nested lists
+#'
+#' @description Convert bin bounds data frame into R-tree structure using nested lists
+#'
+#' @param bin_bounds Data frame of bin bounds; one row per bin, columns for lower and upper bound on each dimension
+#' @param nbins number of bins in each dimension
+#' 
+#' @return R-tree nested list of bin boundaries
+#' @export
+#' @examples 
 #' iq_def <- iqbin(data=iris, bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
 #'                     nbins=c(3,2,2), output="definition",jit=rep(0.001,3))
 #' iq_def$bin_bounds
 #' make_bin_list(bin_bounds=iq_def$bin_bounds,nbins=c(3,2,2))
 
-make_bin_list <- function(bin_bounds,nbins){
+make_bin_list_old <- function(bin_bounds,nbins){
   bin_dim = length(nbins)
   ### build nested list version of bin_bounds to speed up future searching for bins
   lower_level_list <- list(NULL)
@@ -89,6 +138,7 @@ make_bin_list <- function(bin_bounds,nbins){
   return(bin_list)
 }
 
+
 #--------------------------------------
 #' Find bin index from R-tree structure
 #'
@@ -104,21 +154,58 @@ make_bin_list <- function(bin_bounds,nbins){
 #'                               nbins=c(3,2,2), output="both")
 #' bin_index_finder_nest(x=c(6,3,1.5),bin_def=iq_def$bin_def, strict=TRUE)
 
-bin_index_finder_nest <- function(x, bin_def, strict=TRUE){ 
+bin_index_finder_nest_old <- function (x, bin_def, strict = TRUE){
   bin_dim = length(bin_def$nbins)
   nest_list <- bin_def$bin_list[[1]]
   x <- as.numeric(x)
+  for (d in 1:bin_dim) {
+    nest_index <- .bincode(x[[d]], nest_list[[bin_def$nbins[d] + 1]], T, T)
+    if (strict == FALSE) {
+      if (x[[d]] < min(nest_list[[bin_def$nbins[d] + 1]])) nest_index <- 1
+      if (x[[d]] > max(nest_list[[bin_def$nbins[d] + 1]])) nest_index <- bin_def$nbins[d]
+    }
+    nest_list <- nest_list[[nest_index]]
+  }
+  idx <- nest_list
+  return(idx)
+}
+
+#--------------------------------------
+#' Find bin index from R-tree structure
+#'
+#' @description Use R-tree structure using from make_bin_list() function to find bin index for new observation
+#' @param x vector of input values for each of the binned dimensions
+#' @param bin_def Iterative quantile binning definition list
+#' @param strict TRUE/FALSE: If TRUE Observations must fall within existing bins to be assigned; if FALSE the outer bins in each dimension are unbounded to allow outlying values to be assigned.
+#' 
+#' @return bin index for new observation
+#' @export
+#' @examples 
+#' iq_def <- iqbin(data=iris[,], bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
+#'                               nbins=c(3,2,2), output="both")
+#' bin_index_finder_nest(x=c(6,3,1.5),bin_def=iq_def$bin_def , strict=TRUE)
+#' object.size(iq_def$bin_def$bin_list)
+
+bin_index_finder_nest <- function(x, bin_def, strict=TRUE){ 
+  bin_dim <- length(bin_def$nbins)
+  nest_list <- bin_def$bin_list[[1]]
+  nest_index <- rep(NA,bin_dim)
+  if(is.numeric(x) & length(x)==bin_dim){
     for(d in 1:bin_dim){
       #!# check if .bincode is most efficient possible approach
-      nest_index <- .bincode(x[[d]], nest_list[[bin_def$nbins[d]+1]],T,T)
+      bound_vec_idx <- ifelse(d==bin_dim,1,bin_def$nbins[d]+1)
+      nest_index[d] <- .bincode(x[[d]], nest_list[[bound_vec_idx]],T,T)
       if(strict == FALSE){
-        if( x[[d]] < min(nest_list[[bin_def$nbins[d]+1]]) ) nest_index <- 1
-        if( x[[d]] > max(nest_list[[bin_def$nbins[d]+1]]) ) nest_index <- bin_def$nbins[d]
+        if( x[[d]] < min(nest_list[[bound_vec_idx]]) ) nest_index[d] <- 1
+        if( x[[d]] > max(nest_list[[bound_vec_idx]]) ) nest_index[d] <- bin_def$nbins[d]
       }
-      # if(length(nest_index)==0) return(print("Observation outside of observed bins, set strict=FALSE "))
-      nest_list <- nest_list[[nest_index]]
+      if(length(nest_index[d])==0 |  is.na(nest_index[d])) return(print("Observation outside of observed bins, set strict=FALSE "))
+      if(d<bin_dim) nest_list <- nest_list[[nest_index[d]]]
     }
-    idx <- nest_list
+  } else { 
+    return(print("x must be numeric vector"))
+  }
+  idx <- index_collapser(bin_def$nbins,nest_index)
   return(idx)
 } 
 
@@ -246,7 +333,7 @@ index_collapser <- function(nbins, indeces){
   p = length(nbins)
   bin_index <- indeces[p]
   for(j in 1:(p-1)){
-    bin_index <- bin_index + (indeces[j]-1)*prod(nbins[j:(p-1)]) 
+    bin_index <- bin_index + (indeces[j]-1)*prod(nbins[(j+1):p]) 
   }
   return(bin_index)
 }
