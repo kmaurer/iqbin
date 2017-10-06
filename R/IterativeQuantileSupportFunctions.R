@@ -190,21 +190,19 @@ bin_index_finder_nest <- function(x, bin_def, strict=TRUE){
   bin_dim <- length(bin_def$nbins)
   nest_list <- bin_def$bin_list[[1]]
   nest_index <- rep(NA,bin_dim)
-  if(is.numeric(x) & length(x)==bin_dim){
-    for(d in 1:bin_dim){
-      #!# check if .bincode is most efficient possible approach
-      bound_vec_idx <- ifelse(d==bin_dim,1,bin_def$nbins[d]+1)
-      nest_index[d] <- .bincode(x[[d]], nest_list[[bound_vec_idx]],T,T)
-      if(strict == FALSE){
-        if( x[[d]] < min(nest_list[[bound_vec_idx]]) ) nest_index[d] <- 1
-        if( x[[d]] > max(nest_list[[bound_vec_idx]]) ) nest_index[d] <- bin_def$nbins[d]
-      }
-      if(length(nest_index[d])==0 |  is.na(nest_index[d])) return(print("Observation outside of observed bins, set strict=FALSE "))
-      if(d<bin_dim) nest_list <- nest_list[[nest_index[d]]]
+  x <- as.numeric(x) 
+  for(d in 1:bin_dim){
+    #!# check if .bincode is most efficient possible approach
+    bound_vec_idx <- ifelse(d==bin_dim,1,bin_def$nbins[d]+1)
+    nest_index[d] <- .bincode(x[[d]], nest_list[[bound_vec_idx]],T,T)
+    if(strict == FALSE){
+      if( x[[d]] < min(nest_list[[bound_vec_idx]]) ) nest_index[d] <- 1
+      if( x[[d]] > max(nest_list[[bound_vec_idx]]) ) nest_index[d] <- bin_def$nbins[d]
     }
-  } else { 
-    return(print("x must be numeric vector"))
+    if(length(nest_index[d])==0 |  is.na(nest_index[d])) return(print("Observation outside of observed bins, set strict=FALSE "))
+    if(d<bin_dim) nest_list <- nest_list[[nest_index[d]]]
   }
+  
   idx <- index_collapser(bin_def$nbins,nest_index)
   return(idx)
 } 
