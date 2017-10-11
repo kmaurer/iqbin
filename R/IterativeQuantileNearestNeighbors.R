@@ -24,7 +24,7 @@
 
 iqnn <- function(data, y, mod_type="reg", bin_cols, nbins, jit = rep(0,length(bin_cols)), stretch=FALSE, tol = rep(0,length(bin_cols)) ){
   data <- as.data.frame(data)
-  iq_bin <- iqbin2(data, bin_cols, nbins, output="both",jit)
+  iq_bin <- iqbin(data, bin_cols, nbins, output="both",jit)
   if(stretch) iq_bin <- iqbin_stretch(iq_bin, tol=tol)
   iq_bin$bin_def$y <- y
   iq_bin$bin_def$mod_type <- mod_type
