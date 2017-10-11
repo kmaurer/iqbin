@@ -30,63 +30,55 @@
 #' iqbin(data=iris, bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
 #'                     nbins=c(3,5,2), output="data")
 iqbin <- function(data, bin_cols, nbins, jit = rep(0,length(bin_cols)), output="data"){
-  data <- as.data.frame(data) #!# remove someday to improve speed (keep to avoid tibble problems now)
-  # row.names(data) <- 1:nrow(data)
+  data <- as.data.frame(data) 
   bin_dim <- length(bin_cols)
-  bin_data <- matrix(NA,nrow=nrow(data),ncol=bin_dim, dimnames=list(row.names(data),paste(bin_cols,"binned",sep="_")))
   # Initialize with first binning step
   bin_jit <- NULL
-  step_bin_info <- quant_bin_1d(data[,bin_cols[1]], nbins[1],output="both",jit[1])
-  if(sum(jit>0)>0) bin_jit <- data.frame("V1"=step_bin_info$jit_values)
+  step_bin_info <- quant_bin_1d2(data[,bin_cols[1]], nbins[1],output="both",jit[1])
+  # if(sum(jit>0)>0) bin_jit <- data.frame("V1"=step_bin_info$jit_values) #!# drop for timing study
+  bound_list <- list(NULL) 
+  bound_list[[nbins[1]+1]] <- step_bin_info$bin_bounds
   bin_bounds <- matrix(c(step_bin_info$bin_bounds[1:nbins[1]],
                          step_bin_info$bin_bounds[2:(nbins[1]+1)]),
                        nrow=nbins[1],byrow=FALSE )
-  bin_centers <- matrix(step_bin_info$bin_centers, nrow=nbins[1])
-  bin_data[,1] <- step_bin_info$bin_data
+  bin_indeces <- matrix(step_bin_info$bin_number, ncol=1)
   # Loop over remaining variables to use quantile binning WITHIN each of previous state bins
   #!# At some stage need to think about restructuring how binning definition is structured, more included with nested lists perhaps or indexed dataframe with list columns of bin attributes
   for(d in 2:bin_dim){
-    stack_size <- nrow(bin_centers)
+    stack_size <- nrow(bin_bounds)
     stack_matrix <- make_stack_matrix(stack_size,nbins[d])
-    bin_centers <- cbind(stack_matrix %*% bin_centers,matrix(rep(NA,stack_size*nbins[d]),ncol=1))
     bin_bounds <- cbind(stack_matrix %*% bin_bounds,matrix(rep(NA,2*stack_size*nbins[d]),ncol=2))
+    bin_indeces <- cbind(bin_indeces,NA)
+    unique_bin_indeces <- unique(bin_indeces)
     # iterate through unique bins from prior step which are the {1,1+nbins[d],1+2*nbins[d],...} rows of the bin matrices
-    for(b in seq(1,1+(stack_size-1)*nbins[d],by=nbins[d]) ){
-      in_bin_b <- apply(matrix(bin_data[,1:(d-1)],ncol=(d-1)),1,identical,y=bin_centers[b,-d])
-      step_bin_info <- quant_bin_1d(data[in_bin_b,bin_cols[d]], nbins[d],output="both",jit[d])
-      bin_bounds[b:(b+nbins[d]-1),c(2*d-1,2*d)] <- matrix(c(step_bin_info$bin_bounds[1:nbins[d]],
-                                                            step_bin_info$bin_bounds[2:(nbins[d]+1)]),
-                                                          nrow=nbins[d],byrow=FALSE)
-      bin_centers[b:(b+nbins[d]-1),d] <- matrix(step_bin_info$bin_centers, nrow=nbins[d])
-      bin_data[in_bin_b,d] <- step_bin_info$bin_data
-      if(sum(jit>0)>0) bin_jit[in_bin_b,d] <- step_bin_info$jit_values
+    for(b in 1:prod(nbins[1:(d-1)]) ){
+      in_bin_b <- apply(bin_indeces,1,identical,y=unique_bin_indeces[b,])
+      step_bin_info <- quant_bin_1d2(data[in_bin_b,bin_cols[d]], nbins[d],output="both",jit[d])
+      bin_bounds[(b-1)*nbins[d]+1:nbins[d],c(2*d-1,2*d)] <- matrix(c(step_bin_info$bin_bounds[1:nbins[d]],
+                                                                     step_bin_info$bin_bounds[2:(nbins[d]+1)]),
+                                                                   nrow=nbins[d],byrow=FALSE)
+      bin_indeces[in_bin_b,d] <- step_bin_info$bin_number
+      # if(sum(jit>0)>0) bin_jit[in_bin_b,d] <- step_bin_info$jit_values #!# drop for timing study
     }
   }
-  # add bin index column to bin_data
-  #!# I think there must be a more efficient way of doing this, find it
-  if(output!="definition"){
-    bin_centers_idx <- as.data.frame(bin_centers)
-    bin_data_idx <- as.data.frame(bin_data)
-    names(bin_centers_idx) <- colnames(bin_data)
-    bin_centers_idx$bin_index <- 1:nrow(bin_centers_idx)
-    bin_data_idx$order <- 1:nrow(bin_data_idx)
-    bin_data <- merge(round_df(bin_data_idx,10),round_df(bin_centers_idx,10), all.x=TRUE) #!# rounding digits potentially problematic
-    bin_data <- bin_data[order(bin_data$order),]
-    row.names(bin_data) <- 1:nrow(bin_data)
-  }
+  # add bin index column to data with collapse indeces in for each bin into single 
+  data$bin_index <- sapply(1:nrow(data), function(x) index_collapser(nbins=nbins, indeces=bin_indeces[x,]))
+  
   # Create list tree structure for fast queries
   bin_list <- make_bin_list(bin_bounds,nbins)
   if(output=="data") iqbin_obj <- list(data=data,bin_data=bin_data,bin_jit=bin_jit)
   if(output=="definition") {
-    iqbin_obj <- list(bin_centers=bin_centers, bin_bounds=bin_bounds, bin_cols=bin_cols, nbins=nbins, jit=jit, bin_list=bin_list)
+    iqbin_obj <- list(bin_bounds=bin_bounds, bin_cols=bin_cols, nbins=nbins, jit=jit, bin_list=bin_list)
   }
   if(output=="both"){
-    iqbin_obj <- list(bin_data=list(data=data,bin_data=bin_data,bin_jit=bin_jit),
-                bin_def=list(bin_centers=bin_centers, bin_bounds=bin_bounds, bin_cols=bin_cols, nbins=nbins, jit=jit, bin_list=bin_list))
+    iqbin_obj <- list(bin_data=list(data=data,bin_jit=bin_jit),
+                      bin_def=list(bin_bounds=bin_bounds, bin_cols=bin_cols, nbins=nbins, jit=jit, bin_list=bin_list))
     attributes(iqbin_obj)$iq_obj_type <- "iqbin"
   }
   return(iqbin_obj)
 }
+  
+  
 
 #--------------------------------------
 #' Stretching to Add Tolerance Buffer to outermost Iterative Quantile Bins

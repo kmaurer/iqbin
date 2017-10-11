@@ -24,21 +24,23 @@
 
 iqnn <- function(data, y, mod_type="reg", bin_cols, nbins, jit = rep(0,length(bin_cols)), stretch=FALSE, tol = rep(0,length(bin_cols)) ){
   data <- as.data.frame(data)
-  iq_bin <- iqbin(data, bin_cols, nbins, output="both",jit)
+  iq_bin <- iqbin2(data, bin_cols, nbins, output="both",jit)
   if(stretch) iq_bin <- iqbin_stretch(iq_bin, tol=tol)
   iq_bin$bin_def$y <- y
   iq_bin$bin_def$mod_type <- mod_type
-  total_bins = nrow(iq_bin$bin_def$bin_bounds)
+  total_bins <- nrow(iq_bin$bin_def$bin_bounds)
   if(mod_type=="reg"){
-    iq_bin$bin_def$bin_stats <- data.frame(pred = sapply(1:total_bins, function(b) mean(data[iq_bin$bin_data$bin_data$bin_index==b,y], na.rm=TRUE)),
-                                           obs = sapply(1:total_bins, function(b) sum(iq_bin$bin_data$bin_data$bin_index==b)) )
+    iq_bin$bin_def$bin_stats <- data.frame(pred = sapply(1:total_bins, function(b) mean(data[iq_bin$bin_data$data$bin_index==b,y], na.rm=TRUE)),
+                                           obs = sapply(1:total_bins, function(b) sum(iq_bin$bin_data$data$bin_index==b)) )
   }else if(mod_type=="class"){
-    iq_bin$bin_def$bin_stats <- data.frame(pred = sapply(1:total_bins, function(b) majority_vote(data[iq_bin$bin_data$bin_data$bin_index==b,y])),
-                                           obs = sapply(1:total_bins, function(b) sum(iq_bin$bin_data$bin_data$bin_index==b)) )
+    iq_bin$bin_def$bin_stats <- data.frame(pred = sapply(1:total_bins, function(b) majority_vote(data[iq_bin$bin_data$data$bin_index==b,y])),
+                                           obs = sapply(1:total_bins, function(b) sum(iq_bin$bin_data$data$bin_index==b)) )
   }else{return(print("mod_type must be either 'reg' or 'class'"))}
   attributes(iq_bin$bin_def)$iq_obj_type <- "iqnn"
   return(iq_bin$bin_def)
 }
+  
+  
 
 #--------------------------------------
 #' Predict for test data using iqnn model
@@ -70,11 +72,13 @@ iqnn <- function(data, y, mod_type="reg", bin_cols, nbins, jit = rep(0,length(bi
 
 iqnn_predict <- function(iqnn_mod,test_data, type="estimate",strict=FALSE){
   test_data <- as.data.frame(test_data)
-  test_bin <- iqbin_assign(iqnn_mod, test_data, output="data",strict=strict)
-  if(type=="estimate") return(iqnn_mod$bin_stats$pred[test_bin$bin_indeces])
-  if(type=="binsize") return(iqnn_mod$bin_stats$obs[test_bin$bin_indeces])
-  if(type=="both") return(iqnn_mod$bin_stats[test_bin$bin_indeces,])
+  bin_index <- iqbin_assign2(iqnn_mod, test_data, output="bin_index",strict=strict)
+  if(type=="estimate") return(iqnn_mod$bin_stats$pred[bin_index])
+  if(type=="binsize") return(iqnn_mod$bin_stats$obs[bin_index])
+  if(type=="both") return(iqnn_mod$bin_stats[bin_index,])
 }
+  
+  
 
 #--------------------------------------
 #' Cross Validated predictions for iqnn models
