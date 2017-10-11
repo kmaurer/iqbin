@@ -72,7 +72,7 @@ iqnn <- function(data, y, mod_type="reg", bin_cols, nbins, jit = rep(0,length(bi
 
 iqnn_predict <- function(iqnn_mod,test_data, type="estimate",strict=FALSE){
   test_data <- as.data.frame(test_data)
-  bin_index <- iqbin_assign2(iqnn_mod, test_data, output="bin_index",strict=strict)
+  bin_index <- iqbin_assign(iqnn_mod, test_data, output="bin_index",strict=strict)
   if(type=="estimate") return(iqnn_mod$bin_stats$pred[bin_index])
   if(type=="binsize") return(iqnn_mod$bin_stats$obs[bin_index])
   if(type=="both") return(iqnn_mod$bin_stats[bin_index,])
