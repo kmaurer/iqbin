@@ -142,13 +142,14 @@ iqbin_assign <- function(bin_def, new_data, output="data", strict=FALSE){
   #!# need to introduce similar jitter to new data as in definition so "boundary" points allocated randomly
   #
   # loop over each obs in new data, identify the bin indeces then return bin centers for associated bins
-  bin_indeces <- sapply(1:nrow(new_data), function(i){
+  new_data$bin_index <- sapply(1:nrow(new_data), function(i){
     val <- bin_index_finder_nest(new_data[i,bin_def$bin_cols],bin_def, strict=strict)
     if(is.null(val)) val = NA
     return(val)
   })
-
-  if(output=="data") return(list(data=new_data,bin_data=bin_def$bin_centers[bin_indeces,],bin_indeces=bin_indeces))
+  
+  if(output=="bin_index") return(new_data$bin_index)
+  if(output=="data") return(new_data)
   if(output=="both"){
     return(list(bin_data=list(data=new_data,bin_data=bin_def$bin_centers[bin_indeces,],bin_indeces=bin_indeces),
                 bin_def=iq_def))
