@@ -28,7 +28,7 @@ iqnn <- function(data, y, mod_type="reg", bin_cols, nbins, jit = rep(0,length(bi
   if(stretch) iq_bin <- iqbin_stretch(iq_bin, tol=tol)
   iq_bin$bin_def$y <- y
   iq_bin$bin_def$mod_type <- mod_type
-  total_bins = nrow(iq_bin$bin_def$bin_centers)
+  total_bins = nrow(iq_bin$bin_def$bin_bounds)
   if(mod_type=="reg"){
     iq_bin$bin_def$bin_stats <- data.frame(pred = sapply(1:total_bins, function(b) mean(data[iq_bin$bin_data$bin_data$bin_index==b,y], na.rm=TRUE)),
                                            obs = sapply(1:total_bins, function(b) sum(iq_bin$bin_data$bin_data$bin_index==b)) )
@@ -61,7 +61,7 @@ iqnn <- function(data, y, mod_type="reg", bin_cols, nbins, jit = rep(0,length(bi
 #' iqnn_predict(iqnn_mod, test_data,strict=FALSE)
 #' iqnn_predict(iqnn_mod, test_data,strict=TRUE)
 #' iqnn_predict(iqnn_mod, test_data,type="both")
-#' 
+#'
 #' # Test Classifier
 #' iqnn_mod <- iqnn(data=iris[-test_index,], y="Species", mod_type="class", bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"), nbins=c(3,5,2), jit=rep(0.001,3))
 #' test_data <- iris[test_index,]
