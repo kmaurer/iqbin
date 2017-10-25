@@ -168,7 +168,7 @@ iqnn_tune <- function(data, y, mod_type="reg", bin_cols, nbins_range, jit=rep(0,
   
   if(oom_search){
     fold_n <- floor(.9*nrow(data))
-    oom <- as.integer(base^(1:floor(log(fold_n, base=base))))
+    oom <- as.integer(oom_base^(1:floor(log(fold_n, base=oom_base))))
     keeper_idx <- unique(sort(sapply(1:length(oom), function(i){
       which.min(abs(cv_results$nn_equiv-oom[i]))})))
   }
