@@ -176,7 +176,7 @@ iqnn_tune <- function(data, y, mod_type="reg", bin_cols, nbins_range, jit=rep(0,
   for(t in keeper_idx){
     cv_preds <- iqnn_cv_predict(data, y, mod_type=mod_type, bin_cols, nbins_list[[t]], jit, stretch, tol, strict, cv_k)
     if(mod_type=="reg") cv_results$MSE[t] <- mean((data[,y]-cv_preds)^2)
-    if(mod_type=="class") cv_results$error[t] <- sum(cv_preds!=data[,y_name]) / nrow(data)
+    if(mod_type=="class") cv_results$error[t] <- sum(cv_preds!=data[,y]) / nrow(data)
     cv_results$nbins_total[t] <- prod(nbins_list[[t]])
   }
   cv_results <- na.omit(cv_results)
