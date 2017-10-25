@@ -164,6 +164,7 @@ iqnn_tune <- function(data, y, mod_type="reg", bin_cols, nbins_range, jit=rep(0,
   cv_results <- data.frame(bin_dims = sapply(nbins_list, function(x) paste(x,collapse="X")),    
                            nn_equiv = sapply(nbins_list, function(x) (cv_k-1)/cv_k*nrow(data)/prod(x)),
                            nbins_total=NA)
+  cv_results$nbins <- nbins_list
   keeper_idx <- 1:length(nbins_list)
   
   if(oom_search){
