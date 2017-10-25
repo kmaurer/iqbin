@@ -103,11 +103,16 @@ iqnn_predict <- function(iqnn_mod,test_data, type="estimate",strict=FALSE){
 #' cv_preds <- iqnn_cv_predict(data=iris, y="Species",mod_type="class", bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
 #'              nbins=c(3,5,2), jit=rep(0.001,3), strict=FALSE, cv_k=10)
 #' table(cv_preds, iris$Species)
+#' 
+#' cv_preds <- iqnn_cv_predict(data=iris, y="Petal.Length",mod_type="reg", bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
+#'                             nbins=c(3,5,2), jit=rep(0.001,3), strict=FALSE, cv_k=10)
+#' table(cv_preds, iris$Species)
 
 iqnn_cv_predict <- function(data, y, mod_type="reg", bin_cols, nbins, jit=rep(0,length(bin_cols)), stretch=FALSE, tol=rep(0,length(bin_cols)), strict=FALSE, cv_k=10){
   data <- as.data.frame(data)
   cv_cohorts <- make_cv_cohorts(data, cv_k)
-  cv_preds <- factor(rep("NA", nrow(data)),levels(data[, y]))
+  if(mod_type=="class") cv_preds <- factor(rep("NA", nrow(data)),levels(data[, y]))
+  if(mod_type=="reg") cv_preds <- rep(NA, nrow(data))
   for(fold in 1:length(unique(cv_cohorts))){
     test_index <- which(cv_cohorts==fold)
     train_data_temp <- data[-test_index,]

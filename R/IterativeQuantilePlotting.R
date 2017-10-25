@@ -73,8 +73,9 @@ iqbin_plot_3d <- function(iq_obj, round_digits=2){
     bin_cols <- iq_obj$bin_def$bin_cols
     nbins <- iq_obj$bin_def$nbins
     bounds <- as.data.frame(iq_obj$bin_def$bin_bounds)
-    train_points <- iq_obj$bin_data$data[,bin_cols] + iq_obj$bin_data$bin_jit
-    train_points$bin_index <- iq_obj$bin_data$bin_data[,"bin_index"]
+    train_points <- iq_obj$bin_data$data[,iq_obj$bin_def$bin_cols] 
+    if(!is.null(iq_obj$bin_data$bin_jit)) train_points <- train_points + iq_obj$bin_data$bin_jit
+    train_points$bin_index <- iq_obj$bin_data$data[,"bin_index"]
     closed_lower <- ifelse(bounds$V1[train_points$bin_index]==min(bounds$V1[train_points$bin_index]),"[","(")
     train_points$x1 <- paste0(bin_cols[1]," in ",closed_lower,round(bounds$V1,round_digits)[train_points$bin_index],",",round(bounds$V2,round_digits)[train_points$bin_index],"]")
   }
