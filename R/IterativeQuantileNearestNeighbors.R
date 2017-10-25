@@ -141,30 +141,45 @@ iqnn_cv_predict <- function(data, y, mod_type="reg", bin_cols, nbins, jit=rep(0,
 #' @param tol vector of tolerance values to stretch each dimension for future binning
 #' @param strict TRUE/FALSE: If TRUE Observations must fall within existing bins to be assigned; if FALSE the outer bins in each dimension are unbounded to allow outlying values to be assigned.
 #' @param cv_k integer specifying number of folds
+#' @param oom_search TRUE/FALSE: Only consider nbins that change number of neighbors by order of magnitudes
+#' @param oom_base order of magnitude base value (default to powers of 2)
 #' 
 #' @return data frame with one row per binning specification with desriptive and performance statistics: bin dimensitions, number of bins, equivalent k-nearest neightbor size, performance (mean squared error or class error rate)
 #' @family iterative quantile nearest-neighbors functions
 #' @export
 #' @examples 
 #' # 10-fold CV
-#' cv_tune1 <- iqnn_tune(data=iris, y="Petal.Length", bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
+#' cv_tune1 <- iqnn_tune(data=iris, y="Petal.Length", mod_type="reg", bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
 #'                       nbins_range=c(2,5), jit=rep(0.001,3), strict=FALSE, cv_k=10)
 #' cv_tune1
 #' # LOO CV
-#' cv_tune2 <- iqnn_tune(data=iris, y="Petal.Length", bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
-#'                       nbins_range=c(2,5), jit=rep(0.001,3), strict=FALSE, cv_k=nrow(iris))
+#' cv_tune2 <- iqnn_tune(data=iris, y="Petal.Length", mod_type="reg", bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
+#'                       nbins_range=c(2,5,3), jit=rep(0.001,3), strict=FALSE, cv_k=nrow(iris))
 #' cv_tune2
 
-iqnn_tune <- function(data, y, mod_type="reg", bin_cols, nbins_range, jit=rep(0,length(bin_cols)), stretch=FALSE, tol=rep(0,length(bin_cols)), strict=FALSE, cv_k=10){
+iqnn_tune <- function(data, y, mod_type="reg", bin_cols, nbins_range, jit=rep(0,length(bin_cols)), 
+                      stretch=FALSE, tol=rep(0,length(bin_cols)), strict=FALSE, cv_k=10, oom_search=FALSE, oom_base=2){
+ 
   nbins_list <- make_nbins_list(nbins_range,length(bin_cols))
-  cv_results <- data.frame(bin_dims = sapply(nbins_list, function(x) paste(x,collapse="X")))
-  for(t in 1:length(nbins_list)){
+  cv_results <- data.frame(bin_dims = sapply(nbins_list, function(x) paste(x,collapse="X")),    
+                           nn_equiv = sapply(nbins_list, function(x) (cv_k-1)/cv_k*nrow(data)/prod(x)),
+                           nbins_total=NA)
+  keeper_idx <- 1:length(nbins_list)
+  
+  if(oom_search){
+    fold_n <- floor(.9*nrow(data))
+    oom <- as.integer(base^(1:floor(log(fold_n, base=base))))
+    keeper_idx <- unique(sort(sapply(1:length(oom), function(i){
+      which.min(abs(cv_results$nn_equiv-oom[i]))})))
+  }
+  
+  for(t in keeper_idx){
     cv_preds <- iqnn_cv_predict(data, y, mod_type=mod_type, bin_cols, nbins_list[[t]], jit, stretch, tol, strict, cv_k)
     if(mod_type=="reg") cv_results$MSE[t] <- mean((data[,y]-cv_preds)^2)
-    if(mod_type=="class") cv_results$error[t] <- sum(cv_preds!=dat[,y_name]) / nrow(dat)
+    if(mod_type=="class") cv_results$error[t] <- sum(cv_preds!=data[,y_name]) / nrow(data)
     cv_results$nbins_total[t] <- prod(nbins_list[[t]])
-    cv_results$nn_equiv[t] <- (cv_k-1)/cv_k*nrow(data)/prod(nbins_list[[t]])
   }
+  cv_results <- na.omit(cv_results)
   if(mod_type=="reg") cv_results$RMSE <- sqrt(cv_results$MSE)
   return(cv_results)
 }

@@ -62,7 +62,7 @@ iqbin <- function(data, bin_cols, nbins, jit = rep(0,length(bin_cols)), output="
   
   # Create list tree structure for fast queries
   bin_list <- make_bin_list(bin_bounds,nbins)
-  if(output=="data") iqbin_obj <- list(data=data,bin_data=bin_data,bin_jit=bin_jit)
+  if(output=="data") iqbin_obj <- list(data=data,bin_jit=bin_jit)
   if(output=="definition") {
     iqbin_obj <- list(bin_bounds=bin_bounds, bin_cols=bin_cols, nbins=nbins, jit=jit, bin_list=bin_list)
   }

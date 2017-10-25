@@ -39,6 +39,10 @@ Cross-validate an iqnn specification using k-fold scheme on given data
 cv_preds <- iqnn_cv_predict(data=iris, y="Species",mod_type="class", bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
              nbins=c(3,5,2), jit=rep(0.001,3), strict=FALSE, cv_k=10)
 table(cv_preds, iris$Species)
+
+cv_preds <- iqnn_cv_predict(data=iris, y="Petal.Length",mod_type="reg", bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
+                            nbins=c(3,5,2), jit=rep(0.001,3), strict=FALSE, cv_k=10)
+table(cv_preds, iris$Species)
 }
 \seealso{
 Other iterative quantile nearest-neighbors functions: \code{\link{iqnn_predict}},

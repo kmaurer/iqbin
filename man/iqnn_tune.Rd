@@ -6,7 +6,7 @@
 \usage{
 iqnn_tune(data, y, mod_type = "reg", bin_cols, nbins_range, jit = rep(0,
   length(bin_cols)), stretch = FALSE, tol = rep(0, length(bin_cols)),
-  strict = FALSE, cv_k = 10)
+  strict = FALSE, cv_k = 10, oom_search = FALSE, oom_base = 2)
 }
 \arguments{
 \item{data}{Data frame containing the response variable and numeric input variables from the training data}
@@ -27,6 +27,10 @@ iqnn_tune(data, y, mod_type = "reg", bin_cols, nbins_range, jit = rep(0,
 
 \item{cv_k}{integer specifying number of folds}
 
+\item{oom_search}{TRUE/FALSE: Only consider nbins that change number of neighbors by order of magnitudes}
+
+\item{oom_base}{order of magnitude base value (default to powers of 2)}
+
 \item{nbin_range}{positive integer vector containing lower and upper bounds on number of bins in each dimension}
 }
 \value{
@@ -38,12 +42,12 @@ Search through possible numbers of bins per dimension using a iterative rules de
 }
 \examples{
 # 10-fold CV
-cv_tune1 <- iqnn_tune(data=iris, y="Petal.Length", bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
+cv_tune1 <- iqnn_tune(data=iris, y="Petal.Length", mod_type="reg", bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
                       nbins_range=c(2,5), jit=rep(0.001,3), strict=FALSE, cv_k=10)
 cv_tune1
 # LOO CV
-cv_tune2 <- iqnn_tune(data=iris, y="Petal.Length", bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
-                      nbins_range=c(2,5), jit=rep(0.001,3), strict=FALSE, cv_k=nrow(iris))
+cv_tune2 <- iqnn_tune(data=iris, y="Petal.Length", mod_type="reg", bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
+                      nbins_range=c(2,5,3), jit=rep(0.001,3), strict=FALSE, cv_k=nrow(iris))
 cv_tune2
 }
 \seealso{
