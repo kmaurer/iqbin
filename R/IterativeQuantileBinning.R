@@ -34,7 +34,7 @@ iqbin <- function(data, bin_cols, nbins, jit = rep(0,length(bin_cols)), output="
   bin_dim <- length(bin_cols)
   # Initialize with first binning step
   bin_jit <- NULL
-  step_bin_info <- quant_bin_1d(data[,bin_cols[1]], nbins[1],output="both",jit[1])
+  step_bin_info <- quant_bin_1d(xs=data[,bin_cols[1]],nbin=nbins[1],output="both",jit=jit[1])
   # if(sum(jit>0)>0) bin_jit <- data.frame("V1"=step_bin_info$jit_values) #!# drop for timing study
   bin_bounds <- matrix(c(step_bin_info$bin_bounds[1:nbins[1]],
                          step_bin_info$bin_bounds[2:(nbins[1]+1)]),
@@ -49,7 +49,7 @@ iqbin <- function(data, bin_cols, nbins, jit = rep(0,length(bin_cols)), output="
     # iterate through unique bins from prior step which are the {1,1+nbins[d],1+2*nbins[d],...} rows of the bin matrices
     for(b in 1:prod(nbins[1:(d-1)]) ){
       in_bin_b <- bin_index_overall==b
-      step_bin_info <- quant_bin_1d(data[in_bin_b,bin_cols[d]], nbins[d],output="both",jit[d])
+      step_bin_info <- quant_bin_1d(xs=data[in_bin_b,bin_cols[d]], nbin=nbins[d],output="both",jit=jit[d])
       bin_bounds[(b-1)*nbins[d]+1:nbins[d],c(2*d-1,2*d)] <- matrix(c(step_bin_info$bin_bounds[1:nbins[d]],
                                                                      step_bin_info$bin_bounds[2:(nbins[d]+1)]),
                                                                    nrow=nbins[d],byrow=FALSE)
