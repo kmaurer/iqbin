@@ -165,14 +165,14 @@ iqnn_tune <- function(data, y, mod_type="reg", bin_cols, nbins_range, jit=rep(0,
                            nn_equiv = sapply(nbins_list, function(x) (cv_k-1)/cv_k*nrow(data)/prod(x)),
                            nbins_total=NA)
   cv_results$nbins <- nbins_list
-  keeper_idx <- 1:length(nbins_list)
-  
+  fold_n <- floor(.9*nrow(data))
+
   if(oom_search){
-    fold_n <- floor(.9*nrow(data))
-    oom <- as.integer(oom_base^(1:floor(log(fold_n, base=oom_base))))
-    keeper_idx <- unique(sort(sapply(1:length(oom), function(i){
-      which.min(abs(cv_results$nn_equiv-oom[i]))})))
+    unique_nn_size <- as.integer(oom_base^(1:floor(log(fold_n, base=oom_base))))
+  } else {
+    unique_nn_size <- as.integer(unique(round(cv_results$nn_equiv)))
   }
+  keeper_idx <- sort(unique(sapply(1:length(unique_nn_size), function(i) which.min(abs(cv_results$nn_equiv-unique_nn_size[i])))))
   
   for(t in keeper_idx){
     cv_preds <- iqnn_cv_predict(data, y, mod_type=mod_type, bin_cols, nbins_list[[t]], jit, stretch, tol, strict, cv_k)
