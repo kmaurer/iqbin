@@ -24,7 +24,7 @@
 
 iqnn <- function(data, y, mod_type="reg", bin_cols, nbins, jit = rep(0,length(bin_cols)), stretch=FALSE, tol = rep(0,length(bin_cols)) ){
   data <- as.data.frame(data)
-  iq_bin <- iqbin(data, bin_cols, nbins, output="both",jit)
+  iq_bin <- iqbin(data=data, bin_cols=bin_cols, nbins=nbins, jit=jit,output="both")
   if(stretch) iq_bin <- iqbin_stretch(iq_bin, tol=tol)
   iq_bin$bin_def$y <- y
   iq_bin$bin_def$mod_type <- mod_type
@@ -175,7 +175,8 @@ iqnn_tune <- function(data, y, mod_type="reg", bin_cols, nbins_range, jit=rep(0,
   keeper_idx <- sort(unique(sapply(1:length(unique_nn_size), function(i) which.min(abs(cv_results$nn_equiv-unique_nn_size[i])))))
   
   for(t in keeper_idx){
-    cv_preds <- iqnn_cv_predict(data, y, mod_type=mod_type, bin_cols, nbins_list[[t]], jit, stretch, tol, strict, cv_k)
+    cv_preds <- iqnn_cv_predict(data=data, y=y, mod_type=mod_type, bin_cols=bin_cols, nbins=nbins_list[[t]], jit=jit, 
+                                stretch=stretch,tol=tol, strict=FALSE, cv_k=cv_k)
     if(mod_type=="reg") cv_results$MSE[t] <- mean((data[,y]-cv_preds)^2)
     if(mod_type=="class") cv_results$error[t] <- sum(cv_preds!=data[,y]) / nrow(data)
     cv_results$nbins_total[t] <- prod(nbins_list[[t]])
