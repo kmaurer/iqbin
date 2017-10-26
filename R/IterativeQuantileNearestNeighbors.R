@@ -165,7 +165,7 @@ iqnn_tune <- function(data, y, mod_type="reg", bin_cols, nbins_range, jit=rep(0,
                            nn_equiv = sapply(nbins_list, function(x) (cv_k-1)/cv_k*nrow(data)/prod(x)),
                            nbins_total=NA)
   cv_results$nbins <- nbins_list
-  fold_n <- floor(.9*nrow(data))
+  fold_n <- floor(nrow(data)*((cv_k-1)/cv_k))
 
   if(oom_search){
     unique_nn_size <- as.integer(oom_base^(1:floor(log(fold_n, base=oom_base))))
