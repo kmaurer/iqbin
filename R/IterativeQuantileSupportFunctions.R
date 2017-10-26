@@ -24,7 +24,7 @@ quant_bin_1d <- function(xs, nbin, output="data",jit=0){
     jit_values <- runif(length(xs),-jit,jit)
     xs <- xs + jit_values 
   }
-  quants <- quantile(xs, seq(0, 1, by=1/(2*nbin)), type=7)-0.0000000001
+  quants <- quantile(xs, seq(0, 1, by=1/(2*nbin)), type=7)
   bin_bounds <- quants[seq(1,length(quants)+1, by=2)]
   if(jit > 0) bin_bounds[c(1,length(bin_bounds))] <- bin_bounds[c(1,length(bin_bounds))]+c(-jit,jit)
   if(output=="definition") {
