@@ -29,6 +29,7 @@ iqbin(data=iris, bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
                     nbins=c(3,5,2), output="both",jit=rep(0.001,3))
 iqbin(data=iris, bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
                     nbins=c(3,5,2), output="data")
+iqbin(data=iris, bin_cols="Sepal.Length",nbins=3, output="both")
 }
 \seealso{
 Other iterative quantile binning functions: \code{\link{iqbin_assign}},

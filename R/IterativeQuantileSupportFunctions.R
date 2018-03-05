@@ -58,36 +58,47 @@ quant_bin_1d <- function(xs, nbin, output="data",jit=0){
 #'                     nbins=nbins, output="definition",jit=rep(0.001,4))
 #' iq_def$bin_bounds
 #' make_bin_list(bin_bounds=iq_def$bin_bounds,nbins=nbins)
+#' 
+#' iq_def_1d <-  iqbin(data=iris, bin_cols="Sepal.Length",nbins=3, output="definition")
+#' make_bin_list(bin_bounds=iq_def_1d$bin_bounds,nbins=nbins)
 
 make_bin_list <- function(bin_bounds,nbins){
   bin_dim = length(nbins)
-  ### build nested list version of bin_bounds to speed up future searching for bins
-  upper_blocks <- prod(nbins[1:(bin_dim-1)])
-  lower_level_list <-lapply(1:upper_blocks, function(x){
-    list(unique(as.vector(bin_bounds[(x-1)*nbins[bin_dim] + 1:nbins[bin_dim],(bin_dim-1)*2+1:2])))
-  })
-  
-  # at each subsequent level higher in tree, bundle all lower_level_list objects associated with p-th dimensional interval l
-  for(p in (bin_dim-1):1){
-    upper_level_list <- NULL
+  if(!is.numeric(nbins)){
+    stop("nbins needs to be an integer vector")
+  } else if(bin_dim == 1){
+    bin_list <- list(NULL)
+    bin_list[[1]] <- list(as.numeric(step_bin_info$bin_bounds))
+  } else {
+    ### build nested list version of bin_bounds to speed up future searching for bins
+    upper_blocks <- prod(nbins[1:(bin_dim-1)])
+    lower_level_list <-lapply(1:upper_blocks, function(x){
+      list(unique(as.vector(bin_bounds[(x-1)*nbins[bin_dim] + 1:nbins[bin_dim],(bin_dim-1)*2+1:2])))
+    })
     
-    upper_blocks <- ifelse(p==1,1,prod(nbins[1:(p-1)]))
-    lower_block_size <- nbins[p]
-    upper_indeces <- prod(nbins[p:length(nbins)])
-    lower_indeces <- ifelse(p==bin_dim,1,prod(nbins[(p+1):bin_dim]))
-    
-    for(ul in 1:upper_blocks){
-      # create upper level groups 
-      upper_level_list[[ul]] <- list(NULL)
-      for(ll in 1:lower_block_size){
-        upper_level_list[[ul]][[ll]] <- lower_level_list[[(ul-1)*lower_block_size+ll]]
+    # at each subsequent level higher in tree, bundle all lower_level_list objects associated with p-th dimensional interval l
+    for(p in (bin_dim-1):1){
+      upper_level_list <- NULL
+      
+      upper_blocks <- ifelse(p==1,1,prod(nbins[1:(p-1)]))
+      lower_block_size <- nbins[p]
+      upper_indeces <- prod(nbins[p:length(nbins)])
+      lower_indeces <- ifelse(p==bin_dim,1,prod(nbins[(p+1):bin_dim]))
+      
+      for(ul in 1:upper_blocks){
+        # create upper level groups 
+        upper_level_list[[ul]] <- list(NULL)
+        for(ll in 1:lower_block_size){
+          upper_level_list[[ul]][[ll]] <- lower_level_list[[(ul-1)*lower_block_size+ll]]
+        }
+        # upper_level_list[[ul]][[lower_block_size+1]] <- bin_bounds[(ul-1)*upper_indeces + 1:lower_block_size*lower_indeces,(d-1)*2+1:2]
+        upper_level_list[[ul]][[lower_block_size+1]] <- unique(as.vector(bin_bounds[(ul-1)*upper_indeces + 1:lower_block_size*lower_indeces,(p-1)*2+1:2]))
       }
-      # upper_level_list[[ul]][[lower_block_size+1]] <- bin_bounds[(ul-1)*upper_indeces + 1:lower_block_size*lower_indeces,(d-1)*2+1:2]
-      upper_level_list[[ul]][[lower_block_size+1]] <- unique(as.vector(bin_bounds[(ul-1)*upper_indeces + 1:lower_block_size*lower_indeces,(p-1)*2+1:2]))
+      lower_level_list <- upper_level_list
     }
-    lower_level_list <- upper_level_list
+    bin_list <- lower_level_list
   }
-  bin_list <- lower_level_list
+  
   return(bin_list)
 }
 
@@ -202,7 +213,11 @@ bin_index_finder_nest <- function(x, bin_def, strict=TRUE){
     if(d<bin_dim) nest_list <- nest_list[[nest_index[d]]]
   }
   
-  idx <- index_collapser(bin_def$nbins,nest_index)
+  if(bin_dim==1){
+    idx <- nest_index
+  } else{
+    idx <- index_collapser(bin_def$nbins,nest_index)
+  }
   return(idx)
 } 
 

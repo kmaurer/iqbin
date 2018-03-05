@@ -135,7 +135,7 @@ iqnn_cv_predict <- function(data, y, mod_type="reg", bin_cols, nbins, jit=rep(0,
 #' @param y Name of response variable column
 #' @param mod_type Depends on response variables type: "reg" creates iqnn-regression for predicting numeric values, "class" creates iqnn-classifier for predicting categorical values
 #' @param bin_cols vector of column names of variables to iteratively bin, ordered first to last
-#' @param nbin_range positive integer vector containing lower and upper bounds on number of bins in each dimension
+#' @param nbins_range positive integer vector containing lower and upper bounds on number of bins in each dimension
 #' @param jit vector of margins for uniform jitter to each dimension to create seperability of tied obs due to finite precision
 #' @param stretch TRUE/FALSE if will bins be given tolerance buffer
 #' @param tol vector of tolerance values to stretch each dimension for future binning
@@ -154,7 +154,7 @@ iqnn_cv_predict <- function(data, y, mod_type="reg", bin_cols, nbins, jit=rep(0,
 #' cv_tune1
 #' # LOO CV
 #' cv_tune2 <- iqnn_tune(data=iris, y="Petal.Length", mod_type="reg", bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
-#'                       nbins_range=c(2,5,3), jit=rep(0.001,3), strict=FALSE, cv_k=nrow(iris))
+#'                       nbins_range=c(2,5), jit=rep(0.001,3), strict=FALSE, cv_k=nrow(iris))
 #' cv_tune2
 
 iqnn_tune <- function(data, y, mod_type="reg", bin_cols, nbins_range, jit=rep(0,length(bin_cols)), 

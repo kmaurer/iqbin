@@ -23,4 +23,7 @@ iq_def <- iqbin(data=iris, bin_cols=c("Sepal.Length","Sepal.Width","Petal.Length
                     nbins=nbins, output="definition",jit=rep(0.001,4))
 iq_def$bin_bounds
 make_bin_list(bin_bounds=iq_def$bin_bounds,nbins=nbins)
+
+iq_def_1d <-  iqbin(data=iris, bin_cols="Sepal.Length",nbins=3, output="definition")
+make_bin_list(bin_bounds=iq_def_1d$bin_bounds,nbins=nbins)
 }

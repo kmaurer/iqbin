@@ -29,6 +29,7 @@
 #'                     nbins=c(3,5,2), output="both",jit=rep(0.001,3))
 #' iqbin(data=iris, bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
 #'                     nbins=c(3,5,2), output="data")
+#' iqbin(data=iris, bin_cols="Sepal.Length",nbins=3, output="both")
 iqbin <- function(data, bin_cols, nbins, jit = rep(0,length(bin_cols)), output="data"){
   data <- as.data.frame(data) 
   bin_dim <- length(bin_cols)
@@ -41,21 +42,23 @@ iqbin <- function(data, bin_cols, nbins, jit = rep(0,length(bin_cols)), output="
                        nrow=nbins[1],byrow=FALSE )
   bin_index_overall <- step_bin_info$bin_number
   # Loop over remaining variables to use quantile binning WITHIN each of previous state bins
-  for(d in 2:bin_dim){
-    stack_size <- nrow(bin_bounds)
-    stack_matrix <- make_stack_matrix(stack_size,nbins[d])
-    bin_bounds <- cbind(stack_matrix %*% bin_bounds,matrix(rep(NA,2*stack_size*nbins[d]),ncol=2))
-    bin_index_within <- rep(NA,nrow(data))
-    # iterate through unique bins from prior step which are the {1,1+nbins[d],1+2*nbins[d],...} rows of the bin matrices
-    for(b in 1:prod(nbins[1:(d-1)]) ){
-      in_bin_b <- bin_index_overall==b
-      step_bin_info <- quant_bin_1d(xs=data[in_bin_b,bin_cols[d]], nbin=nbins[d],output="both",jit=jit[d])
-      bin_bounds[(b-1)*nbins[d]+1:nbins[d],c(2*d-1,2*d)] <- matrix(c(step_bin_info$bin_bounds[1:nbins[d]],
-                                                                     step_bin_info$bin_bounds[2:(nbins[d]+1)]),
-                                                                   nrow=nbins[d],byrow=FALSE)
-      bin_index_within[in_bin_b] <- step_bin_info$bin_number
+  if(bin_dim >=2){
+    for(d in 2:bin_dim){
+      stack_size <- nrow(bin_bounds)
+      stack_matrix <- make_stack_matrix(stack_size,nbins[d])
+      bin_bounds <- cbind(stack_matrix %*% bin_bounds,matrix(rep(NA,2*stack_size*nbins[d]),ncol=2))
+      bin_index_within <- rep(NA,nrow(data))
+      # iterate through unique bins from prior step which are the {1,1+nbins[d],1+2*nbins[d],...} rows of the bin matrices
+      for(b in 1:prod(nbins[1:(d-1)]) ){
+        in_bin_b <- bin_index_overall==b
+        step_bin_info <- quant_bin_1d(xs=data[in_bin_b,bin_cols[d]], nbin=nbins[d],output="both",jit=jit[d])
+        bin_bounds[(b-1)*nbins[d]+1:nbins[d],c(2*d-1,2*d)] <- matrix(c(step_bin_info$bin_bounds[1:nbins[d]],
+                                                                       step_bin_info$bin_bounds[2:(nbins[d]+1)]),
+                                                                     nrow=nbins[d],byrow=FALSE)
+        bin_index_within[in_bin_b] <- step_bin_info$bin_number
+      }
+      bin_index_overall <- (bin_index_overall-1)*nbins[d] + bin_index_within
     }
-    bin_index_overall <- (bin_index_overall-1)*nbins[d] + bin_index_within
   }
   # add bin index column to data with collapse indeces in for each bin into single 
   data$bin_index <- bin_index_overall
@@ -125,6 +128,7 @@ iqbin <- function(data, bin_cols, nbins, jit = rep(0,length(bin_cols)), output="
 
 
 #--------------------------------------
+#!# needs to be reworked to handle 1dimensional binning and decide if branching list for "both" structure causes too many problems
 #' Stretching to Add Tolerance Buffer to outermost Iterative Quantile Bins
 #'
 #' @description We may wish to include values just outside the constructed bins in future applications. \code{iqbin_stretch} redefines the outermost bin in each dimension from a definition created by \code{\link{iqbin}}
@@ -145,19 +149,25 @@ iqbin <- function(data, bin_cols, nbins, jit = rep(0,length(bin_cols)), output="
 iqbin_stretch <- function(iq_def, tol){
   b = nrow(iq_def$bin_def$bin_bounds)
   p = length(iq_def$bin_def$nbins)
-  for (d in 1:p){
-    blocks <- prod(iq_def$bin_def$nbins[1:d-1])
-    blocks_n <- b/blocks
-    subblocks <- prod(iq_def$bin_def$nbins[1:d])
-    subblocks_n <- b/subblocks
-    # stretch the bins
-    for(block in 1:blocks){
-      lowest_in_block <- seq(1+((block-1)*blocks_n),subblocks_n+((block-1)*blocks_n),by=1)
-      highest_in_block <- seq(blocks_n-subblocks_n+1+((block-1)*blocks_n), blocks_n+((block-1)*blocks_n),by=1)
-      iq_def$bin_def$bin_bounds[lowest_in_block,2*d-1] <- iq_def$bin_def$bin_bounds[lowest_in_block,2*d-1] - tol[d]
-      iq_def$bin_def$bin_bounds[highest_in_block,2*d] <- iq_def$bin_def$bin_bounds[highest_in_block,2*d] + tol[d]
+  if(p ==1 ){
+    iq_def$bin_def$bin_bounds[1,1] <- iq_def$bin_def$bin_bounds[1,1] - tol[1]
+    iq_def$bin_def$bin_bounds[b,2] <- iq_def$bin_def$bin_bounds[b,2] + tol[1]
+  } else {
+    for (d in 1:p){
+      blocks <- prod(iq_def$bin_def$nbins[1:d-1])
+      blocks_n <- b/blocks
+      subblocks <- prod(iq_def$bin_def$nbins[1:d])
+      subblocks_n <- b/subblocks
+      # stretch the bins
+      for(block in 1:blocks){
+        lowest_in_block <- seq(1+((block-1)*blocks_n),subblocks_n+((block-1)*blocks_n),by=1)
+        highest_in_block <- seq(blocks_n-subblocks_n+1+((block-1)*blocks_n), blocks_n+((block-1)*blocks_n),by=1)
+        iq_def$bin_def$bin_bounds[lowest_in_block,2*d-1] <- iq_def$bin_def$bin_bounds[lowest_in_block,2*d-1] - tol[d]
+        iq_def$bin_def$bin_bounds[highest_in_block,2*d] <- iq_def$bin_def$bin_bounds[highest_in_block,2*d] + tol[d]
+      }
     }
   }
+
   iq_def$bin_def$bin_list <- make_bin_list(iq_def$bin_def$bin_bounds,iq_def$bin_def$nbins)
   return(iq_def)
 }

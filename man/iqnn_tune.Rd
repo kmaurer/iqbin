@@ -17,6 +17,8 @@ iqnn_tune(data, y, mod_type = "reg", bin_cols, nbins_range, jit = rep(0,
 
 \item{bin_cols}{vector of column names of variables to iteratively bin, ordered first to last}
 
+\item{nbins_range}{positive integer vector containing lower and upper bounds on number of bins in each dimension}
+
 \item{jit}{vector of margins for uniform jitter to each dimension to create seperability of tied obs due to finite precision}
 
 \item{stretch}{TRUE/FALSE if will bins be given tolerance buffer}
@@ -30,8 +32,6 @@ iqnn_tune(data, y, mod_type = "reg", bin_cols, nbins_range, jit = rep(0,
 \item{oom_search}{TRUE/FALSE: Only consider nbins that change number of neighbors by order of magnitudes}
 
 \item{oom_base}{order of magnitude base value (default to powers of 2)}
-
-\item{nbin_range}{positive integer vector containing lower and upper bounds on number of bins in each dimension}
 }
 \value{
 data frame with one row per binning specification with desriptive and performance statistics: bin dimensitions, number of bins, equivalent k-nearest neightbor size, performance (mean squared error or class error rate)
@@ -47,7 +47,7 @@ cv_tune1 <- iqnn_tune(data=iris, y="Petal.Length", mod_type="reg", bin_cols=c("S
 cv_tune1
 # LOO CV
 cv_tune2 <- iqnn_tune(data=iris, y="Petal.Length", mod_type="reg", bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
-                      nbins_range=c(2,5,3), jit=rep(0.001,3), strict=FALSE, cv_k=nrow(iris))
+                      nbins_range=c(2,5), jit=rep(0.001,3), strict=FALSE, cv_k=nrow(iris))
 cv_tune2
 }
 \seealso{
