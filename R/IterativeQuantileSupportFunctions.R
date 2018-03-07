@@ -68,7 +68,7 @@ make_bin_list <- function(bin_bounds,nbins){
     stop("nbins needs to be an integer vector")
   } else if(bin_dim == 1){
     bin_list <- list(NULL)
-    bin_list[[1]] <- list(as.numeric(bin_bounds))
+    bin_list[[1]] <- list(sort(unique(as.numeric(bin_bounds))))
   } else {
     ### build nested list version of bin_bounds to speed up future searching for bins
     upper_blocks <- prod(nbins[1:(bin_dim-1)])
