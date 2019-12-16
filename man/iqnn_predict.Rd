@@ -40,3 +40,4 @@ iqnn_predict(iqnn_mod, test_data,type="both",strict=FALSE)
 Other iterative quantile nearest-neighbors functions: \code{\link{iqnn_cv_predict}},
   \code{\link{iqnn_tune}}, \code{\link{iqnn}}
 }
+\concept{iterative quantile nearest-neighbors functions}

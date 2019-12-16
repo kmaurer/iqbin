@@ -39,3 +39,4 @@ str(iqnn_mod)
 Other iterative quantile nearest-neighbors functions: \code{\link{iqnn_cv_predict}},
   \code{\link{iqnn_predict}}, \code{\link{iqnn_tune}}
 }
+\concept{iterative quantile nearest-neighbors functions}

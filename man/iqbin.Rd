@@ -35,3 +35,4 @@ iqbin(data=iris, bin_cols="Sepal.Length",nbins=3, output="both")
 Other iterative quantile binning functions: \code{\link{iqbin_assign}},
   \code{\link{iqbin_stretch}}
 }
+\concept{iterative quantile binning functions}

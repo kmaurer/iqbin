@@ -77,56 +77,6 @@ iqbin <- function(data, bin_cols, nbins, jit = rep(0,length(bin_cols)), output="
   return(iqbin_obj)
 }
 
-  
-# iqbin2 <- function(data, bin_cols, nbins, jit = rep(0,length(bin_cols)), output="data"){
-#   data <- as.data.frame(data) 
-#   bin_dim <- length(bin_cols)
-#   # Initialize with first binning step
-#   bin_jit <- NULL
-#   step_bin_info <- quant_bin_1d(data[,bin_cols[1]], nbins[1],output="both",jit[1])
-#   # if(sum(jit>0)>0) bin_jit <- data.frame("V1"=step_bin_info$jit_values) #!# drop for timing study
-#   bin_bounds <- matrix(c(step_bin_info$bin_bounds[1:nbins[1]],
-#                          step_bin_info$bin_bounds[2:(nbins[1]+1)]),
-#                        nrow=nbins[1],byrow=FALSE )
-#   bin_indeces <- matrix(step_bin_info$bin_number, ncol=1)
-#   # Loop over remaining variables to use quantile binning WITHIN each of previous state bins
-#   #!# At some stage need to think about restructuring how binning definition is structured, more included with nested lists perhaps or indexed dataframe with list columns of bin attributes
-#   for(d in 2:bin_dim){
-#     stack_size <- nrow(bin_bounds)
-#     stack_matrix <- make_stack_matrix(stack_size,nbins[d])
-#     bin_bounds <- cbind(stack_matrix %*% bin_bounds,matrix(rep(NA,2*stack_size*nbins[d]),ncol=2))
-#     bin_indeces <- cbind(bin_indeces,NA)
-#     unique_bin_indeces <- unique(bin_indeces)
-#     # iterate through unique bins from prior step which are the {1,1+nbins[d],1+2*nbins[d],...} rows of the bin matrices
-#     for(b in 1:prod(nbins[1:(d-1)]) ){
-#       in_bin_b <- apply(bin_indeces,1,identical,y=unique_bin_indeces[b,])
-#       step_bin_info <- quant_bin_1d(data[in_bin_b,bin_cols[d]], nbins[d],output="both",jit[d])
-#       bin_bounds[(b-1)*nbins[d]+1:nbins[d],c(2*d-1,2*d)] <- matrix(c(step_bin_info$bin_bounds[1:nbins[d]],
-#                                                                      step_bin_info$bin_bounds[2:(nbins[d]+1)]),
-#                                                                    nrow=nbins[d],byrow=FALSE)
-#       bin_indeces[in_bin_b,d] <- step_bin_info$bin_number
-#       # if(sum(jit>0)>0) bin_jit[in_bin_b,d] <- step_bin_info$jit_values #!# drop for timing study
-#     }
-#   }
-#   # add bin index column to data with collapse indeces in for each bin into single 
-#   data$bin_index <- sapply(1:nrow(data), function(x) index_collapser(nbins=nbins, indeces=bin_indeces[x,]))
-#   
-#   # Create list tree structure for fast queries
-#   bin_list <- make_bin_list(bin_bounds,nbins)
-#   if(output=="data") iqbin_obj <- list(data=data,bin_data=bin_data,bin_jit=bin_jit)
-#   if(output=="definition") {
-#     iqbin_obj <- list(bin_bounds=bin_bounds, bin_cols=bin_cols, nbins=nbins, jit=jit, bin_list=bin_list)
-#   }
-#   if(output=="both"){
-#     iqbin_obj <- list(bin_data=list(data=data,bin_jit=bin_jit),
-#                       bin_def=list(bin_bounds=bin_bounds, bin_cols=bin_cols, nbins=nbins, jit=jit, bin_list=bin_list))
-#     attributes(iqbin_obj)$iq_obj_type <- "iqbin"
-#   }
-#   return(iqbin_obj)
-# }
-
-
-
 #--------------------------------------
 #!# needs to be reworked to handle 1dimensional binning and decide if branching list for "both" structure causes too many problems
 #' Stretching to Add Tolerance Buffer to outermost Iterative Quantile Bins

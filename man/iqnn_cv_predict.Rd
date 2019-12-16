@@ -4,9 +4,9 @@
 \alias{iqnn_cv_predict}
 \title{Cross Validated predictions for iqnn models}
 \usage{
-iqnn_cv_predict(data, y, mod_type = "reg", bin_cols, nbins, jit = rep(0,
-  length(bin_cols)), stretch = FALSE, tol = rep(0, length(bin_cols)),
-  strict = FALSE, cv_k = 10)
+iqnn_cv_predict(data, y, mod_type = "reg", bin_cols, nbins,
+  jit = rep(0, length(bin_cols)), stretch = FALSE, tol = rep(0,
+  length(bin_cols)), strict = FALSE, cv_k = 10)
 }
 \arguments{
 \item{data}{Data frame containing the response variable and numeric input variables from the training data}
@@ -48,3 +48,4 @@ table(cv_preds, iris$Species)
 Other iterative quantile nearest-neighbors functions: \code{\link{iqnn_predict}},
   \code{\link{iqnn_tune}}, \code{\link{iqnn}}
 }
+\concept{iterative quantile nearest-neighbors functions}

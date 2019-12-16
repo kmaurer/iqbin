@@ -4,9 +4,10 @@
 \alias{iqnn_tune}
 \title{Tuning function for iqnn model}
 \usage{
-iqnn_tune(data, y, mod_type = "reg", bin_cols, nbins_range, jit = rep(0,
-  length(bin_cols)), stretch = FALSE, tol = rep(0, length(bin_cols)),
-  strict = FALSE, cv_k = 10, oom_search = FALSE, oom_base = 2)
+iqnn_tune(data, y, mod_type = "reg", bin_cols, nbins_range,
+  jit = rep(0, length(bin_cols)), stretch = FALSE, tol = rep(0,
+  length(bin_cols)), strict = FALSE, cv_k = 10, oom_search = FALSE,
+  oom_base = 2)
 }
 \arguments{
 \item{data}{Data frame containing the response variable and numeric input variables from the training data}
@@ -54,3 +55,4 @@ cv_tune2
 Other iterative quantile nearest-neighbors functions: \code{\link{iqnn_cv_predict}},
   \code{\link{iqnn_predict}}, \code{\link{iqnn}}
 }
+\concept{iterative quantile nearest-neighbors functions}

@@ -31,3 +31,4 @@ iqbin_assign(bin_def=iq_def, new_data=iris[withhold_index,], output="data")
 Other iterative quantile binning functions: \code{\link{iqbin_stretch}},
   \code{\link{iqbin}}
 }
+\concept{iterative quantile binning functions}

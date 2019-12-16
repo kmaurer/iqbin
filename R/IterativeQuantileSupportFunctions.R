@@ -11,7 +11,6 @@
 #' @param jit non-negative value to specify a random uniform jitter to the observed values prior to partitioning by quantiles.
 #'
 #' @return output as specified
-#' @export
 #' @examples
 #' quant_bin_1d(ggplot2::diamonds$price,4,output="data")
 #' quant_bin_1d(ggplot2::diamonds$price,4,output="definition")
@@ -51,7 +50,6 @@ quant_bin_1d <- function(xs, nbin, output="data",jit=0){
 #' @param nbins number of bins in each dimension
 #' 
 #' @return R-tree nested list of bin boundaries
-#' @export
 #' @examples 
 #' nbins=c(5,4,3,2)
 #' iq_def <- iqbin(data=iris, bin_cols=c("Sepal.Length","Sepal.Width","Petal.Length","Petal.Width"),
@@ -98,86 +96,7 @@ make_bin_list <- function(bin_bounds,nbins){
     }
     bin_list <- lower_level_list
   }
-  
   return(bin_list)
-}
-
-#--------------------------------------
-#' Convert bin bounds data frame into R-tree structure using nested lists
-#'
-#' @description Convert bin bounds data frame into R-tree structure using nested lists
-#'
-#' @param bin_bounds Data frame of bin bounds; one row per bin, columns for lower and upper bound on each dimension
-#' @param nbins number of bins in each dimension
-#' 
-#' @return R-tree nested list of bin boundaries
-#' @export
-#' @examples 
-#' iq_def <- iqbin(data=iris, bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
-#'                     nbins=c(3,2,2), output="definition",jit=rep(0.001,3))
-#' iq_def$bin_bounds
-#' make_bin_list(bin_bounds=iq_def$bin_bounds,nbins=c(3,2,2))
-
-make_bin_list_old <- function(bin_bounds,nbins){
-  bin_dim = length(nbins)
-  ### build nested list version of bin_bounds to speed up future searching for bins
-  lower_level_list <- list(NULL)
-  for(i in 1:nrow(bin_bounds)){
-    lower_level_list[[i]] <- i
-  } 
-  for(d in bin_dim:1){
-    # for each dimension from second lowest to highest, group up observations from lower_level_list into items in upper_level_list 
-    upper_level_list <- list(NULL)
-    upper_blocks <- ifelse(d==1,1,prod(nbins[1:(d-1)]))
-    lower_block_size <- nbins[d]
-    upper_indeces <- prod(nbins[d:length(nbins)])
-    lower_indeces <- ifelse(d==bin_dim,1,prod(nbins[(d+1):bin_dim]))
-    
-    for(ul in 1:upper_blocks){
-      # create upper level groups 
-      upper_level_list[[ul]] <- list(NULL)
-      for(ll in 1:lower_block_size){
-        upper_level_list[[ul]][[ll]] <- lower_level_list[[(ul-1)*lower_block_size+ll]]
-      }
-      # upper_level_list[[ul]][[lower_block_size+1]] <- bin_bounds[(ul-1)*upper_indeces + 1:lower_block_size*lower_indeces,(d-1)*2+1:2]
-      upper_level_list[[ul]][[lower_block_size+1]] <- unique(as.vector(bin_bounds[(ul-1)*upper_indeces + 1:lower_block_size*lower_indeces,(d-1)*2+1:2]))
-    }
-    lower_level_list <- upper_level_list
-  }
-  bin_list <- lower_level_list
-  return(bin_list)
-}
-
-
-#--------------------------------------
-#' Find bin index from R-tree structure
-#'
-#' @description Use R-tree structure using from make_bin_list() function to find bin index for new observation
-#' @param x vector of input values for each of the binned dimensions
-#' @param bin_def Iterative quantile binning definition list
-#' @param strict TRUE/FALSE: If TRUE Observations must fall within existing bins to be assigned; if FALSE the outer bins in each dimension are unbounded to allow outlying values to be assigned.
-#' 
-#' @return bin index for new observation
-#' @export
-#' @examples 
-#' iq_def <- iqbin(data=iris[-test_index,], bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
-#'                               nbins=c(3,2,2), output="both")
-#' bin_index_finder_nest(x=c(6,3,1.5),bin_def=iq_def$bin_def, strict=TRUE)
-
-bin_index_finder_nest_old <- function (x, bin_def, strict = TRUE){
-  bin_dim = length(bin_def$nbins)
-  nest_list <- bin_def$bin_list[[1]]
-  x <- as.numeric(x)
-  for (d in 1:bin_dim) {
-    nest_index <- .bincode(x[[d]], nest_list[[bin_def$nbins[d] + 1]], T, T)
-    if (strict == FALSE) {
-      if (x[[d]] < min(nest_list[[bin_def$nbins[d] + 1]])) nest_index <- 1
-      if (x[[d]] > max(nest_list[[bin_def$nbins[d] + 1]])) nest_index <- bin_def$nbins[d]
-    }
-    nest_list <- nest_list[[nest_index]]
-  }
-  idx <- nest_list
-  return(idx)
 }
 
 #--------------------------------------
@@ -189,7 +108,6 @@ bin_index_finder_nest_old <- function (x, bin_def, strict = TRUE){
 #' @param strict TRUE/FALSE: If TRUE Observations must fall within existing bins to be assigned; if FALSE the outer bins in each dimension are unbounded to allow outlying values to be assigned.
 #' 
 #' @return bin index for new observation
-#' @export
 #' @examples 
 #' iq_def <- iqbin(data=iris[,], bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
 #'                               nbins=c(3,2,2), output="both")
@@ -229,7 +147,6 @@ bin_index_finder_nest <- function(x, bin_def, strict=TRUE){
 #' @param M number of duplicates
 #' 
 #' @return bin index for new observation
-#' @export
 #' @examples 
 #' make_stack_matrix(3,4)
 
@@ -248,7 +165,6 @@ make_stack_matrix <- function(N,M){
 #' @param cv_K number of folds needed in indexing
 #' 
 #' @return Vector of fold indeces
-#' @export
 #' @examples 
 #' make_cv_cohorts(iris,cv_K=10)
 make_cv_cohorts <- function(dat,cv_K){
@@ -269,7 +185,6 @@ make_cv_cohorts <- function(dat,cv_K){
 #' @param digits number of digits to round
 #' 
 #' @return data frame with rounded numeric variables
-#' @export
 #' @examples 
 #' round_df(head(faithful),digits=1)
 
@@ -285,7 +200,6 @@ round_df <- function(x, digits=2) {
 #' @description Identify the maximum vote earners, then randomly pick winner if there is a tie to break
 #'
 #' @param votes character or factor vector
-#' @export
 #' @examples 
 #' votes <- c("a","a","a","b","b","c")
 #' majority_vote(votes)
@@ -304,7 +218,6 @@ majority_vote <- function(votes){
 #' @param p number of binning dimensions
 #' 
 #' @return list of nbins vectors
-#' @export
 #' @examples 
 #' make_nbins_list(c(2,4),3)
 
@@ -330,7 +243,6 @@ make_nbins_list <- function(nbin_range, p){
 #' @param indeces p-dimensional indeces for bin
 #' 
 #' @return integer index unique to p-dim bin
-#' @export
 #' @examples 
 #' index_collapser(nbins=c(2,2,2),indeces=c(1,1,1))
 #' index_collapser(nbins=c(2,2,2),indeces=c(1,1,2))
@@ -349,15 +261,3 @@ index_collapser <- function(nbins, indeces){
   }
   return(bin_index)
 }
-
-
-#--------------------------------------
-### Helper function for suggesting parameters for jittering number of bins in each dimension
-# based on number of ties and data resolution
-#!#
-# roots_for_nbins <- function(x, p, k){
-#   nbin_opt <- x/k
-#   rep(ceiling(nbin_opt^(1/p)),p)
-# }
-# # Test with goal to mimic 10-nn with p=3 dimensions
-# roots_for_nbins(270,3,10)

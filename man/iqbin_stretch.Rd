@@ -28,3 +28,4 @@ stretch_iq_def$bin_def$bin_bounds
 Other iterative quantile binning functions: \code{\link{iqbin_assign}},
   \code{\link{iqbin}}
 }
+\concept{iterative quantile binning functions}
