@@ -19,8 +19,9 @@ Convert bin bounds data frame into R-tree structure using nested lists
 }
 \examples{
 nbins=c(5,4,3,2)
-iq_def <- iqbin(data=iris, bin_cols=c("Sepal.Length","Sepal.Width","Petal.Length","Petal.Width"),
-                    nbins=nbins, output="definition",jit=rep(0.001,4))
+iq_def <- iqbin(data=iris, 
+                bin_cols=c("Sepal.Length","Sepal.Width","Petal.Length","Petal.Width"),
+                nbins=nbins, output="definition",jit=rep(0.001,4))
 iq_def$bin_bounds
 make_bin_list(bin_bounds=iq_def$bin_bounds,nbins=nbins)
 

@@ -43,11 +43,13 @@ Search through possible numbers of bins per dimension using a iterative rules de
 }
 \examples{
 # 10-fold CV
-cv_tune1 <- iqnn_tune(data=iris, y="Petal.Length", mod_type="reg", bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
+cv_tune1 <- iqnn_tune(data=iris, y="Petal.Length", mod_type="reg",  
+                      bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
                       nbins_range=c(2,5), jit=rep(0.001,3), strict=FALSE, cv_k=10)
 cv_tune1
 # LOO CV
-cv_tune2 <- iqnn_tune(data=iris, y="Petal.Length", mod_type="reg", bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
+cv_tune2 <- iqnn_tune(data=iris, y="Petal.Length", mod_type="reg",  
+                      bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
                       nbins_range=c(2,5), jit=rep(0.001,3), strict=FALSE, cv_k=nrow(iris))
 cv_tune2
 }
