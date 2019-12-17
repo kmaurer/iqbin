@@ -8,6 +8,8 @@ iqbin_plot_3d(iq_obj, round_digits = 2)
 }
 \arguments{
 \item{iq_obj}{iterative quantile object: either from iqbin or iqnn function with data and definition}
+
+\item{round_digits}{decimal places to round the data used in structure of plot}
 }
 \value{
 create ggplot2 object with iq bins displayed
@@ -16,12 +18,17 @@ create ggplot2 object with iq bins displayed
 Plotting 3-dimensional iterative quantile bins using faceting
 }
 \examples{
-iq_obj <- iqbin(data=iris, bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"), nbins=c(2,5,3), output="both",jit=rep(0.1,3))
+iq_obj <- iqbin(data=iris, bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"), 
+                nbins=c(2,5,3), output="both",jit=rep(0.1,3))
 iqbin_plot_3d(iq_obj)
 
-iq_obj <- iqnn(data=iris, y="Species", mod_type="class", bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"), nbins=c(2,5,3), jit=rep(0.001,3))
+iq_obj <- iqnn(data=iris, y="Species", mod_type="class", 
+               bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"), 
+               nbins=c(2,5,3), jit=rep(0.001,3))
 iqbin_plot_3d(iq_obj)
 
-iq_obj <- iqnn(data=iris, y="Petal.Length", mod_type="reg", bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"), nbins=c(2,5,3), jit=rep(0.001,3))
+iq_obj <- iqnn(data=iris, y="Petal.Length", mod_type="reg", 
+               bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"), 
+               nbins=c(2,5,3), jit=rep(0.001,3))
 iqbin_plot_3d(iq_obj)
 }

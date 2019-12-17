@@ -18,8 +18,9 @@ updated binning definition list with outermost bin boundaries extended by tolera
 We may wish to include values just outside the constructed bins in future applications. \code{iqbin_stretch} redefines the outermost bin in each dimension from a definition created by \code{\link{iqbin}}
 }
 \examples{
-iq_def <- iqbin(data=iris, bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
-                             nbins=c(3,2,2), output="both")
+iq_def <- iqbin(data=iris, 
+                bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
+                nbins=c(3,2,2), output="both")
 stretch_iq_def <- iqbin_stretch(iq_def, tol = c(1,1,1))
 iq_def$bin_def$bin_bounds
 stretch_iq_def$bin_def$bin_bounds

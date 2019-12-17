@@ -7,13 +7,13 @@
 iqbin_assign(bin_def, new_data, output = "data", strict = FALSE)
 }
 \arguments{
+\item{bin_def}{Iterative quantile binning definition list as output from \code{\link{iqbin}} function}
+
 \item{new_data}{Data frame with column names matching the binned columns from bin-training data}
 
 \item{output}{Matches format of \code{\link{iqbin}} and inherets properties from \code{\link{iqnn}} if applicable {"data","both"}}
 
 \item{strict}{TRUE/FALSE: If TRUE Observations must fall within existing bins to be assigned; if FALSE the outer bins in each dimension are unbounded to allow outlying values to be assigned.}
-
-\item{iq_def}{Iterative quantile binning definition list as output from \code{\link{iqbin}} function}
 }
 \value{
 list of new_data, binned data and indecies. Optionally the bin definition may also be included
@@ -23,8 +23,9 @@ Assigning New observations to Existing Iterative Quantile Bins by using binning 
 }
 \examples{
 withhold_index <- c(1,2,51,52,101,102)
-iq_def <- iqbin(data=iris[-withhold_index,], bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
-                              nbins=c(3,2,2), output="definition")
+iq_def <- iqbin(data=iris[-withhold_index,],
+                bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
+                nbins=c(3,2,2), output="definition")
 iqbin_assign(bin_def=iq_def, new_data=iris[withhold_index,], output="data")
 }
 \seealso{

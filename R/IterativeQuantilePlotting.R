@@ -10,16 +10,22 @@
 #' @return create ggplot2 object with iq bins displayed
 #' @export
 #' @examples
-#' iq_obj <- iqbin(data=iris, bin_cols=c("Sepal.Length","Sepal.Width"), nbins=c(5,3), output="both",jit=rep(0.1,2))
+#' iq_obj <- iqbin(data=iris, bin_cols=c("Sepal.Length","Sepal.Width"), 
+#'                 nbins=c(5,3), output="both",jit=rep(0.1,2))
 #' iqbin_plot_2d(iq_obj)
 #' 
-#' iq_obj <- iqbin(data=iris, bin_cols=c("Sepal.Length","Sepal.Width"), nbins=c(5,3), output="both")
+#' iq_obj <- iqbin(data=iris, bin_cols=c("Sepal.Length","Sepal.Width"), 
+#'                 nbins=c(5,3), output="both")
 #' iqbin_plot_2d(iq_obj)
 #' 
-#' iq_obj <- iqnn(data=iris, y="Species", mod_type="class", bin_cols=c("Sepal.Length","Sepal.Width"), nbins=c(5,3), jit=rep(0.001,2))
+#' iq_obj <- iqnn(data=iris, y="Species", mod_type="class", 
+#'                bin_cols=c("Sepal.Length","Sepal.Width"), 
+#'                nbins=c(5,3), jit=rep(0.001,2))
 #' iqbin_plot_2d(iq_obj)
 #' 
-#' iq_obj <- iqnn(data=iris, y="Petal.Length", mod_type="reg", bin_cols=c("Sepal.Length","Sepal.Width"), nbins=c(5,3), jit=rep(0.001,2))
+#' iq_obj <- iqnn(data=iris, y="Petal.Length", mod_type="reg", 
+#'                bin_cols=c("Sepal.Length","Sepal.Width"), 
+#'                nbins=c(5,3), jit=rep(0.001,2))
 #' iqbin_plot_2d(iq_obj)
 
 iqbin_plot_2d <- function(iq_obj){
@@ -37,11 +43,16 @@ iqbin_plot_2d <- function(iq_obj){
   p1 <- ggplot2::ggplot() +
     ggplot2::theme_bw()
   if(attributes(iq_obj)$iq_obj_type == "iqbin"){
-    p1 <- p1 + ggplot2::geom_rect(ggplot2::aes(xmin=V1, xmax=V2, ymin=V3, ymax=V4), data=bounds,color="black",fill=NA) +
+    p1 <- p1 + ggplot2::geom_rect(ggplot2::aes(xmin=train_points$V1, xmax=train_points$V2,
+                                               ymin=train_points$V3, ymax=train_points$V4), 
+                                  data=bounds,color="black",fill=NA) +
       ggplot2::geom_point(ggplot2::aes_string(x=bin_cols[1],y=bin_cols[2]),data=train_points)
   } 
   if(attributes(iq_obj)$iq_obj_type == "iqnn"){
-    p1 <- p1 + ggplot2::geom_rect(ggplot2::aes(xmin=V1, xmax=V2, ymin=V3, ymax=V4,fill=pred), data=bounds,color="black")+
+    p1 <- p1 + ggplot2::geom_rect(ggplot2::aes(xmin=train_points$V1, xmax=train_points$V2,
+                                               ymin=train_points$V3, ymax=train_points$V4,
+                                               fill=train_points$pred),
+                                  data=bounds,color="black")+
       ggplot2::labs(x=bin_cols[1],y=bin_cols[2])
     if(iq_obj$mod_type=="class") p1 <- p1 + ggplot2::scale_fill_discrete(paste0("Predicted \n",iq_obj$y))
     if(iq_obj$mod_type=="reg") p1 <- p1 + ggplot2::scale_fill_continuous(paste0("Predicted \n",iq_obj$y),low="gray90",high="gray20")
@@ -55,17 +66,23 @@ iqbin_plot_2d <- function(iq_obj){
 #' @description Plotting 3-dimensional iterative quantile bins using faceting
 #'
 #' @param iq_obj iterative quantile object: either from iqbin or iqnn function with data and definition
+#' @param round_digits decimal places to round the data used in structure of plot
 #'
 #' @return create ggplot2 object with iq bins displayed
 #' @export
 #' @examples
-#' iq_obj <- iqbin(data=iris, bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"), nbins=c(2,5,3), output="both",jit=rep(0.1,3))
+#' iq_obj <- iqbin(data=iris, bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"), 
+#'                 nbins=c(2,5,3), output="both",jit=rep(0.1,3))
 #' iqbin_plot_3d(iq_obj)
 #' 
-#' iq_obj <- iqnn(data=iris, y="Species", mod_type="class", bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"), nbins=c(2,5,3), jit=rep(0.001,3))
+#' iq_obj <- iqnn(data=iris, y="Species", mod_type="class", 
+#'                bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"), 
+#'                nbins=c(2,5,3), jit=rep(0.001,3))
 #' iqbin_plot_3d(iq_obj)
 #'
-#' iq_obj <- iqnn(data=iris, y="Petal.Length", mod_type="reg", bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"), nbins=c(2,5,3), jit=rep(0.001,3))
+#' iq_obj <- iqnn(data=iris, y="Petal.Length", mod_type="reg", 
+#'                bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"), 
+#'                nbins=c(2,5,3), jit=rep(0.001,3))
 #' iqbin_plot_3d(iq_obj)
 
 iqbin_plot_3d <- function(iq_obj, round_digits=2){
@@ -92,7 +109,9 @@ iqbin_plot_3d <- function(iq_obj, round_digits=2){
   p1 <- ggplot2::ggplot() +
     ggplot2::theme_bw()
   if(attributes(iq_obj)$iq_obj_type == "iqbin"){
-    p1 <- p1 + ggplot2::geom_rect(ggplot2::aes(xmin=V3, xmax=V4, ymin=V5, ymax=V6),color="black",fill=NA, data=bounds)+
+    p1 <- p1 + ggplot2::geom_rect(ggplot2::aes(xmin=train_points$V3, xmax=train_points$V4,
+                                               ymin=train_points$V5, ymax=train_points$V6),
+                                  color="black",fill=NA, data=bounds)+
       ggplot2::facet_grid(.~x1)+
       ggplot2::geom_point(ggplot2::aes_string(x=bin_cols[2],y=bin_cols[3]), 
                  data=train_points)+
@@ -100,7 +119,9 @@ iqbin_plot_3d <- function(iq_obj, round_digits=2){
                     subtitle=paste(paste(bin_cols,collapse=" X ")," (",paste(nbins,collapse="X"),")",sep="") )
   } 
   if(attributes(iq_obj)$iq_obj_type == "iqnn"){
-    p1 <- p1 + ggplot2::geom_rect(ggplot2::aes(xmin=V3, xmax=V4, ymin=V5, ymax=V6,fill=pred),color="black", data=bounds)+
+    p1 <- p1 + ggplot2::geom_rect(ggplot2::aes(xmin=train_points$V3, xmax=train_points$V4, 
+                                               ymin=train_points$V5, ymax=train_points$V6,
+                                               fill=train_points$pred),color="black", data=bounds)+
       ggplot2::facet_grid(.~x1) + 
       ggplot2::labs(x=iq_obj$bin_cols[2],y=iq_obj$bin_cols[3],
                     title="Iterative Quantile Nearest Neighbor Predicted Responses",

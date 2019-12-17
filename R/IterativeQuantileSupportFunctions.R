@@ -20,10 +20,10 @@
 quant_bin_1d <- function(xs, nbin, output="data",jit=0){
   jit_values <- NULL
   if(jit > 0) {
-    jit_values <- runif(length(xs),-jit,jit)
+    jit_values <- stats::runif(length(xs),-jit,jit)
     xs <- xs + jit_values 
   }
-  quants <- quantile(xs, seq(0, 1, by=1/(2*nbin)), type=7)
+  quants <- stats::quantile(xs, seq(0, 1, by=1/(2*nbin)), type=7)
   bin_bounds <- quants[seq(1,length(quants)+1, by=2)]
   if(jit > 0) bin_bounds[c(1,length(bin_bounds))] <- bin_bounds[c(1,length(bin_bounds))]+c(-jit,jit)
   if(output=="definition") {
@@ -52,8 +52,9 @@ quant_bin_1d <- function(xs, nbin, output="data",jit=0){
 #' @return R-tree nested list of bin boundaries
 #' @examples 
 #' nbins=c(5,4,3,2)
-#' iq_def <- iqbin(data=iris, bin_cols=c("Sepal.Length","Sepal.Width","Petal.Length","Petal.Width"),
-#'                     nbins=nbins, output="definition",jit=rep(0.001,4))
+#' iq_def <- iqbin(data=iris, 
+#'                 bin_cols=c("Sepal.Length","Sepal.Width","Petal.Length","Petal.Width"),
+#'                 nbins=nbins, output="definition",jit=rep(0.001,4))
 #' iq_def$bin_bounds
 #' make_bin_list(bin_bounds=iq_def$bin_bounds,nbins=nbins)
 #' 
@@ -100,6 +101,34 @@ make_bin_list <- function(bin_bounds,nbins){
 }
 
 #--------------------------------------
+#' Function to turn indeces from p-dimensions into one set of unique indeces
+#'
+#' @description take p-dim indeces and convert fast/slow running indeces
+#'
+#' @param nbins number of bins in each dimension
+#' @param indeces p-dimensional indeces for bin
+#' 
+#' @return integer index unique to p-dim bin
+#' @examples 
+#' index_collapser(nbins=c(2,2,2),indeces=c(1,1,1))
+#' index_collapser(nbins=c(2,2,2),indeces=c(1,1,2))
+#' index_collapser(nbins=c(2,2,2),indeces=c(1,2,1))
+#' index_collapser(nbins=c(2,2,2),indeces=c(1,2,2))
+#' index_collapser(nbins=c(2,2,2),indeces=c(2,1,1))
+#' index_collapser(nbins=c(2,2,2),indeces=c(2,1,2))
+#' index_collapser(nbins=c(2,2,2),indeces=c(2,2,1))
+#' index_collapser(nbins=c(2,2,2),indeces=c(2,2,2))
+
+index_collapser <- function(nbins, indeces){
+  p = length(nbins)
+  bin_index <- indeces[p]
+  for(j in 1:(p-1)){
+    bin_index <- bin_index + (indeces[j]-1)*prod(nbins[(j+1):p]) 
+  }
+  return(bin_index)
+}
+
+#--------------------------------------
 #' Find bin index from R-tree structure
 #'
 #' @description Use R-tree structure using from make_bin_list() function to find bin index for new observation
@@ -111,8 +140,7 @@ make_bin_list <- function(bin_bounds,nbins){
 #' @examples 
 #' iq_def <- iqbin(data=iris[,], bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
 #'                               nbins=c(3,2,2), output="both")
-#' bin_index_finder_nest(x=c(6,3,1.5),bin_def=iq_def$bin_def , strict=TRUE)
-#' object.size(iq_def$bin_def$bin_list)
+#' bin_index_finder_nest(x=c(6,3,1.5), bin_def=iq_def$bin_def, strict=TRUE)
 
 bin_index_finder_nest <- function(x, bin_def, strict=TRUE){ 
   bin_dim <- length(bin_def$nbins)
@@ -120,7 +148,6 @@ bin_index_finder_nest <- function(x, bin_def, strict=TRUE){
   nest_index <- rep(NA,bin_dim)
   x <- as.numeric(x) 
   for(d in 1:bin_dim){
-    #!# check if .bincode is most efficient possible approach
     bound_vec_idx <- ifelse(d==bin_dim,1,bin_def$nbins[d]+1)
     nest_index[d] <- .bincode(x[[d]], nest_list[[bound_vec_idx]],T,T)
     if(strict == FALSE){
@@ -151,7 +178,7 @@ bin_index_finder_nest <- function(x, bin_def, strict=TRUE){
 #' make_stack_matrix(3,4)
 
 make_stack_matrix <- function(N,M){ 
-  mat <- unname(model.matrix(~as.factor(rep(1:N,each=M))-(1)))
+  mat <- unname(stats::model.matrix(~as.factor(rep(1:N,each=M))-(1)))
   attributes(mat)[2:3]<-NULL
   return(mat)
 } 
@@ -232,32 +259,4 @@ make_nbins_list <- function(nbin_range, p){
     }
   }
   return(nbins_list)
-}
-
-#--------------------------------------
-#' Function to turn indeces from p-dimensions into one set of unique indeces
-#'
-#' @description take p-dim indeces and convert fast/slow running indeces
-#'
-#' @param nbins number of bins in each dimension
-#' @param indeces p-dimensional indeces for bin
-#' 
-#' @return integer index unique to p-dim bin
-#' @examples 
-#' index_collapser(nbins=c(2,2,2),indeces=c(1,1,1))
-#' index_collapser(nbins=c(2,2,2),indeces=c(1,1,2))
-#' index_collapser(nbins=c(2,2,2),indeces=c(1,2,1))
-#' index_collapser(nbins=c(2,2,2),indeces=c(1,2,2))
-#' index_collapser(nbins=c(2,2,2),indeces=c(2,1,1))
-#' index_collapser(nbins=c(2,2,2),indeces=c(2,1,2))
-#' index_collapser(nbins=c(2,2,2),indeces=c(2,2,1))
-#' index_collapser(nbins=c(2,2,2),indeces=c(2,2,2))
-
-index_collapser <- function(nbins, indeces){
-  p = length(nbins)
-  bin_index <- indeces[p]
-  for(j in 1:(p-1)){
-    bin_index <- bin_index + (indeces[j]-1)*prod(nbins[(j+1):p]) 
-  }
-  return(bin_index)
 }

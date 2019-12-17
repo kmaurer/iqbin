@@ -30,6 +30,7 @@
 #' iqbin(data=iris, bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
 #'                     nbins=c(3,5,2), output="data")
 #' iqbin(data=iris, bin_cols="Sepal.Length",nbins=3, output="both")
+
 iqbin <- function(data, bin_cols, nbins, jit = rep(0,length(bin_cols)), output="data"){
   data <- as.data.frame(data) 
   bin_dim <- length(bin_cols)
@@ -78,7 +79,6 @@ iqbin <- function(data, bin_cols, nbins, jit = rep(0,length(bin_cols)), output="
 }
 
 #--------------------------------------
-#!# needs to be reworked to handle 1dimensional binning and decide if branching list for "both" structure causes too many problems
 #' Stretching to Add Tolerance Buffer to outermost Iterative Quantile Bins
 #'
 #' @description We may wish to include values just outside the constructed bins in future applications. \code{iqbin_stretch} redefines the outermost bin in each dimension from a definition created by \code{\link{iqbin}}
@@ -90,8 +90,9 @@ iqbin <- function(data, bin_cols, nbins, jit = rep(0,length(bin_cols)), output="
 #' @family iterative quantile binning functions
 #' @export
 #' @examples
-#' iq_def <- iqbin(data=iris, bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
-#'                              nbins=c(3,2,2), output="both")
+#' iq_def <- iqbin(data=iris, 
+#'                 bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
+#'                 nbins=c(3,2,2), output="both")
 #' stretch_iq_def <- iqbin_stretch(iq_def, tol = c(1,1,1))
 #' iq_def$bin_def$bin_bounds
 #' stretch_iq_def$bin_def$bin_bounds
@@ -127,7 +128,7 @@ iqbin_stretch <- function(iq_def, tol){
 #'
 #' @description Assigning New observations to Existing Iterative Quantile Bins by using binning definition created by \code{\link{iqbin}} function 
 #'
-#' @param iq_def Iterative quantile binning definition list as output from \code{\link{iqbin}} function
+#' @param bin_def Iterative quantile binning definition list as output from \code{\link{iqbin}} function
 #' @param new_data Data frame with column names matching the binned columns from bin-training data
 #' @param output Matches format of \code{\link{iqbin}} and inherets properties from \code{\link{iqnn}} if applicable {"data","both"}
 #' @param strict TRUE/FALSE: If TRUE Observations must fall within existing bins to be assigned; if FALSE the outer bins in each dimension are unbounded to allow outlying values to be assigned.
@@ -137,14 +138,14 @@ iqbin_stretch <- function(iq_def, tol){
 #' @export
 #' @examples
 #' withhold_index <- c(1,2,51,52,101,102)
-#' iq_def <- iqbin(data=iris[-withhold_index,], bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
-#'                               nbins=c(3,2,2), output="definition")
+#' iq_def <- iqbin(data=iris[-withhold_index,],
+#'                 bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
+#'                 nbins=c(3,2,2), output="definition")
 #' iqbin_assign(bin_def=iq_def, new_data=iris[withhold_index,], output="data")
 
 iqbin_assign <- function(bin_def, new_data, output="data", strict=FALSE){
   # new_data <- as.data.frame(new_data)
   #!# need to introduce similar jitter to new data as in definition so "boundary" points allocated randomly
-  #
   # loop over each obs in new data, identify the bin indeces then return bin centers for associated bins
   new_data$bin_index <- sapply(1:nrow(new_data), function(i){
     val <- bin_index_finder_nest(new_data[i,bin_def$bin_cols],bin_def, strict=strict)
@@ -155,8 +156,8 @@ iqbin_assign <- function(bin_def, new_data, output="data", strict=FALSE){
   if(output=="bin_index") return(new_data$bin_index)
   if(output=="data") return(new_data)
   if(output=="both"){
-    return(list(bin_data=list(data=new_data,bin_data=bin_def$bin_centers[bin_indeces,],bin_indeces=bin_indeces),
-                bin_def=iq_def))
+    return(list(bin_data=list(data=new_data, bin_index = new_data$bin_index),
+                bin_def=bin_def))
   }
 }
 

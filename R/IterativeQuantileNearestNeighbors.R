@@ -18,7 +18,8 @@
 #' @export
 #' 
 #' @examples 
-#' iqnn_mod <- iqnn(data=iris, y="Species", mod_type="class", bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
+#' iqnn_mod <- iqnn(data=iris, y="Species", mod_type="class",
+#'                  bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
 #'                  nbins=c(3,5,2), jit=rep(0.001,3), tol = rep(0.001,3))
 #' str(iqnn_mod)
 
@@ -58,14 +59,18 @@ iqnn <- function(data, y, mod_type="reg", bin_cols, nbins, jit = rep(0,length(bi
 #' @examples 
 #' # Test Regression
 #' test_index <- c(1,2,51,52,101,102)
-#' iqnn_mod <- iqnn(data=iris[-test_index,], y="Petal.Length", bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"), nbins=c(3,5,2), jit=rep(0.001,3), stretch=TRUE, tol=rep(.001,3))
+#' iqnn_mod <- iqnn(data=iris[-test_index,], y="Petal.Length",
+#'                  bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"), 
+#'                  nbins=c(3,5,2), jit=rep(0.001,3), stretch=TRUE, tol=rep(.001,3))
 #' test_data <- iris[test_index,]
 #' iqnn_predict(iqnn_mod, test_data,strict=FALSE)
 #' iqnn_predict(iqnn_mod, test_data,strict=TRUE)
 #' iqnn_predict(iqnn_mod, test_data,type="both")
 #'
 #' # Test Classifier
-#' iqnn_mod <- iqnn(data=iris[-test_index,], y="Species", mod_type="class", bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"), nbins=c(3,5,2), jit=rep(0.001,3))
+#' iqnn_mod <- iqnn(data=iris[-test_index,], y="Species", mod_type="class", 
+#'                  bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"), 
+#'                  nbins=c(3,5,2), jit=rep(0.001,3))
 #' test_data <- iris[test_index,]
 #' iqnn_predict(iqnn_mod, test_data,strict=TRUE)
 #' iqnn_predict(iqnn_mod, test_data,type="both",strict=FALSE)
@@ -100,11 +105,13 @@ iqnn_predict <- function(iqnn_mod,test_data, type="estimate",strict=FALSE){
 #' @family iterative quantile nearest-neighbors functions
 #' @export
 #' @examples 
-#' cv_preds <- iqnn_cv_predict(data=iris, y="Species",mod_type="class", bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
-#'              nbins=c(3,5,2), jit=rep(0.001,3), strict=FALSE, cv_k=10)
+#' cv_preds <- iqnn_cv_predict(data=iris, y="Species",mod_type="class", 
+#'                             bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
+#'                             nbins=c(3,5,2), jit=rep(0.001,3), strict=FALSE, cv_k=10)
 #' table(cv_preds, iris$Species)
 #' 
-#' cv_preds <- iqnn_cv_predict(data=iris, y="Petal.Length",mod_type="reg", bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
+#' cv_preds <- iqnn_cv_predict(data=iris, y="Petal.Length",mod_type="reg",
+#'                             bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
 #'                             nbins=c(3,5,2), jit=rep(0.001,3), strict=FALSE, cv_k=10)
 #' table(cv_preds, iris$Species)
 
@@ -149,11 +156,13 @@ iqnn_cv_predict <- function(data, y, mod_type="reg", bin_cols, nbins, jit=rep(0,
 #' @export
 #' @examples 
 #' # 10-fold CV
-#' cv_tune1 <- iqnn_tune(data=iris, y="Petal.Length", mod_type="reg", bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
+#' cv_tune1 <- iqnn_tune(data=iris, y="Petal.Length", mod_type="reg",  
+#'                       bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
 #'                       nbins_range=c(2,5), jit=rep(0.001,3), strict=FALSE, cv_k=10)
 #' cv_tune1
 #' # LOO CV
-#' cv_tune2 <- iqnn_tune(data=iris, y="Petal.Length", mod_type="reg", bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
+#' cv_tune2 <- iqnn_tune(data=iris, y="Petal.Length", mod_type="reg",  
+#'                       bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
 #'                       nbins_range=c(2,5), jit=rep(0.001,3), strict=FALSE, cv_k=nrow(iris))
 #' cv_tune2
 
@@ -181,7 +190,7 @@ iqnn_tune <- function(data, y, mod_type="reg", bin_cols, nbins_range, jit=rep(0,
     if(mod_type=="class") cv_results$error[t] <- sum(cv_preds!=data[,y]) / nrow(data)
     cv_results$nbins_total[t] <- prod(nbins_list[[t]])
   }
-  cv_results <- na.omit(cv_results)
+  cv_results <- stats::na.omit(cv_results)
   if(mod_type=="reg") cv_results$RMSE <- sqrt(cv_results$MSE)
   return(cv_results)
 }

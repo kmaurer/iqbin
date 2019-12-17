@@ -5,10 +5,11 @@ Version: 0.1.0
 Authors@R: person("Karsten", "Maurer", email = "maurerkt@miamioh.edu",
                   role = c("aut", "cre"))
 Maintainer: The package maintainer <yourself@somewhere.net>
-Description: This package allows for both the definition of iterative
-    quantile bins, and use of these bins as approximate nearest neighbor 
-    regions
-License: MIT
+Description: This package allows for the empirical definition of iterative 
+    quantile bins. Also provides functions for visualizing these
+    bin structures and using these bins as approximate nearest neighbor 
+    regions for nearest neighbor regression and classification. 
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.1.1
