@@ -11,12 +11,6 @@
 #' @param jit non-negative value to specify a random uniform jitter to the observed values prior to partitioning by quantiles.
 #'
 #' @return output as specified
-#' @examples
-#' quant_bin_1d(ggplot2::diamonds$price,4,output="data")
-#' quant_bin_1d(ggplot2::diamonds$price,4,output="definition")
-#' quant_bin_1d(runif(100,0,10),nbin=4,output="both")
-#' quant_bin_1d(runif(100,0,10),nbin=4,output="both", jit=.1)
-
 quant_bin_1d <- function(xs, nbin, output="data",jit=0){
   jit_values <- NULL
   if(jit > 0) {
@@ -34,12 +28,6 @@ quant_bin_1d <- function(xs, nbin, output="data",jit=0){
     if(output=="both") return(list(bin_number=bin_number,bin_bounds=bin_bounds,jit_values=jit_values))
   }
 }
-# Speed test
-# load("~/onePercentSample.Rdata")
-# timer <- Sys.time()
-# quant_bin_1d(onePercentSample$total_amount,100,output="data", jit=.00001)
-# Sys.time()-timer
-# Note: using .bincode() this take ~2 seconds instead of ~10 seconds with for loop overwrite from original
 
 #--------------------------------------
 #' Convert bin bounds data frame into R-tree structure using nested lists
@@ -50,17 +38,6 @@ quant_bin_1d <- function(xs, nbin, output="data",jit=0){
 #' @param nbins number of bins in each dimension
 #' 
 #' @return R-tree nested list of bin boundaries
-#' @examples 
-#' nbins=c(5,4,3,2)
-#' iq_def <- iqbin(data=iris, 
-#'                 bin_cols=c("Sepal.Length","Sepal.Width","Petal.Length","Petal.Width"),
-#'                 nbins=nbins, output="definition",jit=rep(0.001,4))
-#' iq_def$bin_bounds
-#' make_bin_list(bin_bounds=iq_def$bin_bounds,nbins=nbins)
-#' 
-#' iq_def_1d <-  iqbin(data=iris, bin_cols="Sepal.Length",nbins=3, output="definition")
-#' make_bin_list(bin_bounds=iq_def_1d$bin_bounds,nbins=nbins)
-
 make_bin_list <- function(bin_bounds,nbins){
   bin_dim = length(nbins)
   if(!is.numeric(nbins)){
@@ -109,16 +86,6 @@ make_bin_list <- function(bin_bounds,nbins){
 #' @param indeces p-dimensional indeces for bin
 #' 
 #' @return integer index unique to p-dim bin
-#' @examples 
-#' index_collapser(nbins=c(2,2,2),indeces=c(1,1,1))
-#' index_collapser(nbins=c(2,2,2),indeces=c(1,1,2))
-#' index_collapser(nbins=c(2,2,2),indeces=c(1,2,1))
-#' index_collapser(nbins=c(2,2,2),indeces=c(1,2,2))
-#' index_collapser(nbins=c(2,2,2),indeces=c(2,1,1))
-#' index_collapser(nbins=c(2,2,2),indeces=c(2,1,2))
-#' index_collapser(nbins=c(2,2,2),indeces=c(2,2,1))
-#' index_collapser(nbins=c(2,2,2),indeces=c(2,2,2))
-
 index_collapser <- function(nbins, indeces){
   p = length(nbins)
   bin_index <- indeces[p]
@@ -137,11 +104,6 @@ index_collapser <- function(nbins, indeces){
 #' @param strict TRUE/FALSE: If TRUE Observations must fall within existing bins to be assigned; if FALSE the outer bins in each dimension are unbounded to allow outlying values to be assigned.
 #' 
 #' @return bin index for new observation
-#' @examples 
-#' iq_def <- iqbin(data=iris[,], bin_cols=c("Sepal.Length","Sepal.Width","Petal.Width"),
-#'                               nbins=c(3,2,2), output="both")
-#' bin_index_finder_nest(x=c(6,3,1.5), bin_def=iq_def$bin_def, strict=TRUE)
-
 bin_index_finder_nest <- function(x, bin_def, strict=TRUE){ 
   bin_dim <- length(bin_def$nbins)
   nest_list <- bin_def$bin_list[[1]]
@@ -174,9 +136,6 @@ bin_index_finder_nest <- function(x, bin_def, strict=TRUE){
 #' @param M number of duplicates
 #' 
 #' @return bin index for new observation
-#' @examples 
-#' make_stack_matrix(3,4)
-
 make_stack_matrix <- function(N,M){ 
   mat <- unname(stats::model.matrix(~as.factor(rep(1:N,each=M))-(1)))
   attributes(mat)[2:3]<-NULL
@@ -192,8 +151,6 @@ make_stack_matrix <- function(N,M){
 #' @param cv_K number of folds needed in indexing
 #' 
 #' @return Vector of fold indeces
-#' @examples 
-#' make_cv_cohorts(iris,cv_K=10)
 make_cv_cohorts <- function(dat,cv_K){
   if(nrow(dat) %% cv_K == 0){ # if perfectly divisible
     cv_cohort <- sample(rep(1:cv_K, each=(nrow(dat)%/%cv_K)))
@@ -212,9 +169,6 @@ make_cv_cohorts <- function(dat,cv_K){
 #' @param digits number of digits to round
 #' 
 #' @return data frame with rounded numeric variables
-#' @examples 
-#' round_df(head(faithful),digits=1)
-
 round_df <- function(x, digits=2) {
   numeric_columns <- sapply(x, class) == 'numeric'
   x[numeric_columns] <-  round(x[numeric_columns], digits)
@@ -227,10 +181,6 @@ round_df <- function(x, digits=2) {
 #' @description Identify the maximum vote earners, then randomly pick winner if there is a tie to break
 #'
 #' @param votes character or factor vector
-#' @examples 
-#' votes <- c("a","a","a","b","b","c")
-#' majority_vote(votes)
-
 majority_vote <- function(votes){
   top_votes <- names(which.max(table(as.character(votes)))) # collect top vote earner (ties allowed)
   return(sample(top_votes,1)) # randomly select to break any ties for best
@@ -245,9 +195,6 @@ majority_vote <- function(votes){
 #' @param p number of binning dimensions
 #' 
 #' @return list of nbins vectors
-#' @examples 
-#' make_nbins_list(c(2,4),3)
-
 make_nbins_list <- function(nbin_range, p){
   nbins_list <- list(rep(nbin_range[1],p))
   counter = 1
