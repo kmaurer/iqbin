@@ -1,15 +1,4 @@
 ### iterative quantile binning functions
-# first source in all helper functions
-# source("IterativeQuantileBinningSupportFunctions.R")
-# Note: a #!# tag will be added on items that need improved efficiency/clarity
-
-
-# Some useful keyboard shortcuts for package authoring:
-#
-#   Build and Reload Package:  'Ctrl + Shift + B'
-#   Check Package:             'Ctrl + Shift + E'
-#   Test Package:              'Ctrl + Shift + T'
-
 #--------------------------------------
 #' Iterative Quantile Binning
 #'

@@ -16,7 +16,7 @@ create ggplot2 object with iq bins displayed
 used for binning the numeric values by empirical quantile
 }
 \examples{
-iq_obj <- iqbin(data=iris, bin_cols=c("Sepal.Length","Sepal.Width"), 
+iq_obj <- iqbin(data=iris, bin_cols=c("Sepal.Length","Sepal.Width"),
                 nbins=c(5,3), output="both",jit=rep(0.1,2))
 iqbin_plot_2d(iq_obj)
 
