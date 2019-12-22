@@ -17,6 +17,3 @@ data frame with rounded numeric variables
 \description{
 Based on https://gist.github.com/avsmith/e6f4f654451da139230b to round all numeric variables
 }
-\examples{
-round_df(head(faithful),digits=1)
-}

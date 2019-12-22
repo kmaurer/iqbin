@@ -17,13 +17,3 @@ integer index unique to p-dim bin
 \description{
 take p-dim indeces and convert fast/slow running indeces
 }
-\examples{
-index_collapser(nbins=c(2,2,2),indeces=c(1,1,1))
-index_collapser(nbins=c(2,2,2),indeces=c(1,1,2))
-index_collapser(nbins=c(2,2,2),indeces=c(1,2,1))
-index_collapser(nbins=c(2,2,2),indeces=c(1,2,2))
-index_collapser(nbins=c(2,2,2),indeces=c(2,1,1))
-index_collapser(nbins=c(2,2,2),indeces=c(2,1,2))
-index_collapser(nbins=c(2,2,2),indeces=c(2,2,1))
-index_collapser(nbins=c(2,2,2),indeces=c(2,2,2))
-}

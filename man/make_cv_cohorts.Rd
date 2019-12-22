@@ -17,6 +17,3 @@ Vector of fold indeces
 \description{
 Create set of indeces for tracking observations to cv folds. Creates equally balanced folds
 }
-\examples{
-make_cv_cohorts(iris,cv_K=10)
-}

@@ -21,9 +21,3 @@ output as specified
 \description{
 used for binning the numeric values by empirical quantile
 }
-\examples{
-quant_bin_1d(ggplot2::diamonds$price,4,output="data")
-quant_bin_1d(ggplot2::diamonds$price,4,output="definition")
-quant_bin_1d(runif(100,0,10),nbin=4,output="both")
-quant_bin_1d(runif(100,0,10),nbin=4,output="both", jit=.1)
-}

@@ -17,6 +17,3 @@ bin index for new observation
 \description{
 function to make a J matrix for duplicating the N rows of a matrix M times each. (support funciton for iqbin function)
 }
-\examples{
-make_stack_matrix(3,4)
-}

@@ -12,7 +12,3 @@ majority_vote(votes)
 \description{
 Identify the maximum vote earners, then randomly pick winner if there is a tie to break
 }
-\examples{
-votes <- c("a","a","a","b","b","c")
-majority_vote(votes)
-}
